@@ -32,6 +32,10 @@ async function retrievePost(
   const post = page.locator("[data-postid] > article");
   if (!post) throw "no post";
 
+  // remove the actions menu: we delete the path from inside the button svg so as to retain the
+  // header height
+  const actionsMenu = post.locator("header > button path");
+  actionsMenu.evaluate((el) => el.remove());
   // remove the log in button
   const logInButton = post.locator("footer .justify-end");
   logInButton.evaluate((el) => el.remove());
