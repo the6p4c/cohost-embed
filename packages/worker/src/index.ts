@@ -1,7 +1,11 @@
-import EmbedJobManager from "cohost-embed-job-manager";
 import process from "node:process";
 import { chromium } from "playwright";
 import winston from "winston";
+
+import { envString } from "cohost-embed-common/config";
+import { Post, getPostWorker } from "cohost-embed-common/job";
+
+const REDIS_HOST = envString("REDIS_HOST");
 
 const logger = winston.createLogger({
   format: winston.format.cli(),
@@ -9,42 +13,38 @@ const logger = winston.createLogger({
 });
 
 async function main() {
-  logger.info("started");
+  logger.info("started :O");
 
-  const jobManager = new EmbedJobManager();
-  await jobManager.connect();
-  logger.info("connected to redis");
+  const worker = getPostWorker(
+    async (projectHandle, slug) => {
+      logger.info(`[@${projectHandle}, ${slug}] claimed >:3`);
 
-  await jobManager.listenForJobs(async (id) => {
-    const { projectHandle, slug } = id;
+      const embed = await retrievePost(projectHandle, slug);
+      logger.info(`[@${projectHandle}, ${slug}] retrieved :3`);
 
-    const jobIdentifier = `[@${projectHandle} ${slug}]`;
-    logger.info(`${jobIdentifier} claimed`);
+      return embed;
+    },
+    { host: REDIS_HOST }
+  );
 
-    const embed = await generateEmbed(projectHandle, slug);
-    logger.info(`${jobIdentifier} embed generated`);
-
-    jobManager.completeJob(id, embed);
-
-    logger.info(`${jobIdentifier} complete`);
-  });
-  logger.info("listening for jobs");
-
+  logger.info("processing jobs ^_^");
+  const quit = async () =>
+    new Promise<void>((resolve) => {
+      process.on("SIGINT", () => resolve());
+      process.on("SIGTERM", () => resolve());
+    });
   await quit();
-  logger.info("terminating");
 
-  await jobManager.disconnect();
-  logger.info("disconnected from redis");
+  logger.info("terminating :(");
+  await worker.close();
+
+  logger.info("terminated :'(");
 }
 
-function quit(): Promise<void> {
-  return new Promise((resolve) => {
-    process.on("SIGINT", () => resolve());
-    process.on("SIGTERM", () => resolve());
-  });
-}
-
-async function generateEmbed(projectHandle: string, slug: string) {
+async function retrievePost(
+  projectHandle: string,
+  slug: string
+): Promise<Post> {
   const url = `https://cohost.org/${projectHandle}/post/${slug}`;
 
   const browser = await chromium.launchPersistentContext(

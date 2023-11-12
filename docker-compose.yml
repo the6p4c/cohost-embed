@@ -5,11 +5,12 @@ services:
       - redis
     volumes:
       - ./packages/web:/home/node/web
-      - ./packages/job-manager:/home/node/job-manager
+      - ./packages/common:/home/node/common
     working_dir: /home/node/web
-    entrypoint: sh -c "(cd /home/node/job-manager && npm install) && npm install && npm run dev"
+    entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
     environment:
       NODE_ENV: development
+      REDIS_HOST: redis
     ports:
       - "3000:3000"
   worker:
@@ -18,11 +19,12 @@ services:
       - redis
     volumes:
       - ./packages/worker:/home/node/worker
-      - ./packages/job-manager:/home/node/job-manager
+      - ./packages/common:/home/node/common
     working_dir: /home/node/worker
-    entrypoint: sh -c "(cd /home/node/job-manager && npm install) && npm install && npm run dev"
+    entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
     environment:
       NODE_ENV: development
+      REDIS_HOST: redis
   redis:
     image: redis
     volumes:
