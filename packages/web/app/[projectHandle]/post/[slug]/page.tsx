@@ -70,7 +70,8 @@ export default async function Post({
                 <tr>
                   <th scope="row">image</th>
                   <td>
-                    <img src={imageUrl} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imageUrl} alt="" />
                   </td>
                 </tr>
               </tbody>

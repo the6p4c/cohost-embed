@@ -1,28 +1,20 @@
 services:
   web:
-    build: ./packages/web
+    build:
+      dockerfile: ./packages/web/Dockerfile
+      context: .
     depends_on:
       - redis
-    volumes:
-      - ./packages/web:/home/node/web
-      - ./packages/common:/home/node/common
-    working_dir: /home/node/web
-    entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
     environment:
-      NODE_ENV: development
+      BASE_URL: https://cohost.org.doggirl.gay
     ports:
       - "3000:3000"
   worker:
-    build: ./packages/worker
+    build:
+      dockerfile: ./packages/worker/Dockerfile
+      context: .
     depends_on:
       - redis
-    volumes:
-      - ./packages/worker:/home/node/worker
-      - ./packages/common:/home/node/common
-    working_dir: /home/node/worker
-    entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
-    environment:
-      NODE_ENV: development
   redis:
     image: redis
     volumes:

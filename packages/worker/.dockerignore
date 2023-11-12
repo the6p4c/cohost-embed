@@ -1,5 +1,4 @@
-# build
-dist/
+Dockerfile
 
 # npm
 node_modules/

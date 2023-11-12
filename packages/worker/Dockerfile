@@ -1,6 +1,9 @@
-FROM node:21
+###############
+# development #
+###############
+FROM node:21 as development
 USER node
-WORKDIR /home/node
+WORKDIR /home/node/
 
 # install playwright chromium and its required system dependencies (deps first as they're the least
 # likely to change)
@@ -13,3 +16,21 @@ RUN npx playwright install-deps chromium
 USER node
 RUN npx playwright install chromium
 
+#########
+# build #
+#########
+FROM development as build
+ENV NODE_ENV production
+
+COPY --chown=node packages/common/ common/
+RUN cd common/ && npm ci
+
+COPY --chown=node packages/worker/ worker/
+RUN cd worker/ && npm ci
+
+##############
+# production #
+##############
+FROM build as production
+
+CMD cd worker/ && npm run start
