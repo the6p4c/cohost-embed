@@ -47,6 +47,11 @@ async function retrievePost(
   const page = await browser.newPage();
   await page.goto(url);
 
+  // ensure header bar doesn't overlap with tall posts
+  await page.addStyleTag({
+    content: "html { scroll-padding-top: 4rem; }",
+  });
+
   const post = page.locator("[data-postid] > article");
   if (!post) throw "no post";
 
