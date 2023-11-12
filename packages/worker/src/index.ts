@@ -1,49 +1,28 @@
+import config from "cohost-embed-common/config";
 import { Post, getPostWorker } from "cohost-embed-common/job";
 import process from "node:process";
 import { chromium } from "playwright";
 import winston from "winston";
 
 const logger = winston.createLogger({
+  level: config.logLevel,
   format: winston.format.cli(),
   transports: [new winston.transports.Console()],
 });
-
-async function main() {
-  logger.info("started :O");
-
-  const worker = getPostWorker(async (projectHandle, slug) => {
-    logger.info(`[@${projectHandle}, ${slug}] claimed >:3`);
-
-    const embed = await retrievePost(projectHandle, slug);
-    logger.info(`[@${projectHandle}, ${slug}] complete :3`);
-
-    return embed;
-  });
-
-  logger.info("processing jobs ^_^");
-  const quit = async () =>
-    new Promise<void>((resolve) => {
-      process.on("SIGINT", () => resolve());
-      process.on("SIGTERM", () => resolve());
-    });
-  await quit();
-
-  logger.info("terminating :(");
-  await worker.close();
-
-  logger.info("terminated :'(");
-}
 
 async function retrievePost(
   projectHandle: string,
   slug: string
 ): Promise<Post> {
-  const url = `https://cohost.org/${projectHandle}/post/${slug}`;
+  const logPrefix = `[@${projectHandle}, ${slug}]`;
+  logger.info(`${logPrefix} claimed >:3`);
 
   const browser = await chromium.launchPersistentContext(
     "./.cache/userDataDir"
   );
 
+  const url = `https://cohost.org/${projectHandle}/post/${slug}`;
+  logger.debug(`${logPrefix} navigating to ${url}`);
   const page = await browser.newPage();
   await page.goto(url);
 
@@ -66,6 +45,8 @@ async function retrievePost(
   await page.close();
   await browser.close();
 
+  logger.info(`${logPrefix} complete :3`);
+
   return {
     themeColor,
     siteName,
@@ -76,6 +57,23 @@ async function retrievePost(
       mimeType: "image/png",
     },
   };
+}
+
+async function main() {
+  logger.info("worker started :O");
+  const worker = getPostWorker(retrievePost);
+  logger.info("processing jobs ^_^");
+  await quit();
+  logger.info("terminating :(");
+  await worker.close();
+  logger.info("worker terminated :'(");
+}
+
+async function quit(): Promise<void> {
+  return new Promise((resolve) => {
+    process.on("SIGINT", () => resolve());
+    process.on("SIGTERM", () => resolve());
+  });
 }
 
 main();
