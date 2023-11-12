@@ -1,0 +1,28 @@
+{
+  "name": "cohost-embed-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "cohost-embed-job-manager": "file:../job-manager",
+    "next": "14.0.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "redis": "^4.6.10"
+  },
+  "devDependencies": {
+    "@tsconfig/next": "^2.0.1",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.2",
+    "prettier": "^3.0.3",
+    "typescript": "^5"
+  }
+}

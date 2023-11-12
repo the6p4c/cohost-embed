@@ -1,0 +1,19 @@
+.debugTable {
+  border-collapse: collapse;
+  border: 1px solid black;
+  font-family: monospace;
+}
+
+.debugTable th[scope="row"] {
+  border-right: 1px solid black;
+  text-align: right;
+}
+
+.debugTable th,
+.debugTable td {
+  padding: 0.25rem;
+}
+
+.default {
+  color: #800;
+}

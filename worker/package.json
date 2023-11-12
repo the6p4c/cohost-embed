@@ -1,0 +1,18 @@
+{
+  "name": "worker",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false ./src/index.ts"
+  },
+  "dependencies": {
+    "@types/node": "^20.9.0",
+    "cohost-embed-job-manager": "file:../job-manager",
+    "playwright": "^1.39.0",
+    "redis": "^4.6.10",
+    "tsx": "^4.1.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node21": "^21.0.0"
+  }
+}
