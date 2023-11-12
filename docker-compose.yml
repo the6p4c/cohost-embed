@@ -1,32 +1,32 @@
 services:
   web:
-    build: ./web
+    build: ./packages/web
     depends_on:
       - redis
     volumes:
-      - ./web:/home/node/web
-      - ./job-manager:/home/node/job-manager
+      - ./packages/web:/home/node/web
+      - ./packages/job-manager:/home/node/job-manager
     working_dir: /home/node/web
-    entrypoint: sh -c "(cd ../job-manager && npm install) && npm install && npm run dev"
+    entrypoint: sh -c "(cd /home/node/job-manager && npm install) && npm install && npm run dev"
     environment:
       NODE_ENV: development
     ports:
       - "3000:3000"
   worker:
-    build: ./worker
+    build: ./packages/worker
     depends_on:
       - redis
     volumes:
-      - ./worker:/home/node/worker
-      - ./job-manager:/home/node/job-manager
+      - ./packages/worker:/home/node/worker
+      - ./packages/job-manager:/home/node/job-manager
     working_dir: /home/node/worker
-    entrypoint: sh -c "(cd ../job-manager && npm install) && npm install && npm run dev"
+    entrypoint: sh -c "(cd /home/node/job-manager && npm install) && npm install && npm run dev"
     environment:
       NODE_ENV: development
   redis:
     image: redis
     volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./packages/redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
     expose:
       - "6379"
