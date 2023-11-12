@@ -1,11 +1,7 @@
+import { Post, getPostWorker } from "cohost-embed-common/job";
 import process from "node:process";
 import { chromium } from "playwright";
 import winston from "winston";
-
-import { envString } from "cohost-embed-common/config";
-import { Post, getPostWorker } from "cohost-embed-common/job";
-
-const REDIS_HOST = envString("REDIS_HOST");
 
 const logger = winston.createLogger({
   format: winston.format.cli(),
@@ -15,17 +11,14 @@ const logger = winston.createLogger({
 async function main() {
   logger.info("started :O");
 
-  const worker = getPostWorker(
-    async (projectHandle, slug) => {
-      logger.info(`[@${projectHandle}, ${slug}] claimed >:3`);
+  const worker = getPostWorker(async (projectHandle, slug) => {
+    logger.info(`[@${projectHandle}, ${slug}] claimed >:3`);
 
-      const embed = await retrievePost(projectHandle, slug);
-      logger.info(`[@${projectHandle}, ${slug}] retrieved :3`);
+    const embed = await retrievePost(projectHandle, slug);
+    logger.info(`[@${projectHandle}, ${slug}] retrieved :3`);
 
-      return embed;
-    },
-    { host: REDIS_HOST }
-  );
+    return embed;
+  });
 
   logger.info("processing jobs ^_^");
   const quit = async () =>

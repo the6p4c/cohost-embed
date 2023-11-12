@@ -1,22 +1,21 @@
+import { getPost } from "cohost-embed-common/job";
 import { NextResponse } from "next/server";
 
-import { useEmbedImage } from "../embed";
-
 export async function GET(
-  request: Request,
+  _request: Request,
   {
     params: { projectHandle, slug },
   }: { params: { projectHandle: string; slug: string } },
 ) {
-  const image = await useEmbedImage(projectHandle, slug);
+  const post = await getPost(projectHandle, slug);
 
-  if (!image) {
+  if (!post) {
     return new NextResponse("", {
       status: 404,
     });
   }
 
-  const response = new NextResponse(image.data);
-  response.headers.set("Content-Type", image.mimeType);
+  const response = new NextResponse(Buffer.from(post.image.base64, "base64"));
+  response.headers.set("Content-Type", post.image.mimeType);
   return response;
 }

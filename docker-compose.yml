@@ -10,7 +10,6 @@ services:
     entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
     environment:
       NODE_ENV: development
-      REDIS_HOST: redis
     ports:
       - "3000:3000"
   worker:
@@ -24,7 +23,6 @@ services:
     entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
     environment:
       NODE_ENV: development
-      REDIS_HOST: redis
   redis:
     image: redis
     volumes:

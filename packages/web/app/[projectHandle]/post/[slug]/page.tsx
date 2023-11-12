@@ -5,9 +5,6 @@ import DiscordEmbed from "./DiscordEmbed";
 
 import styles from "./page.module.css";
 
-import { envString } from "cohost-embed-common/config";
-const REDIS_HOST = envString("REDIS_HOST");
-
 export default async function Post({
   params: { projectHandle, slug },
   searchParams: { debug },
@@ -17,10 +14,7 @@ export default async function Post({
 }) {
   const isDebug = debug !== undefined;
 
-  const post = await getPost(projectHandle, slug, {
-    host: REDIS_HOST,
-    timeout: 5000,
-  });
+  const post = await getPost(projectHandle, slug);
   if (!post) return notFound();
 
   const metadata = (
