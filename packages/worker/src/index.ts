@@ -1,7 +1,8 @@
 import config from "cohost-embed-common/config";
 import { Post, getPostWorker } from "cohost-embed-common/job";
 import process from "node:process";
-import { BrowserContext, chromium } from "playwright";
+import { BrowserContext, Locator, Page, chromium } from "playwright";
+import sharp from "sharp";
 import winston from "winston";
 
 const logger = winston.createLogger({
@@ -16,31 +17,20 @@ async function retrievePost(
   slug: string
 ): Promise<Post> {
   const logPrefix = `[@${projectHandle}, ${slug}]`;
-
-  // create a page and navigate to the post
   const url = `https://cohost.org/${projectHandle}/post/${slug}`;
+
   logger.debug(`${logPrefix} navigating to ${url}`);
   const page = await browser.newPage();
   await page.goto(url);
 
-  // ensure header bar doesn't overlap with tall posts
-  await page.addStyleTag({
-    content: "html { scroll-padding-top: 4rem; }",
-  });
-
-  // find the post
+  logger.debug(`${logPrefix} looking for post`);
   const post = page.locator("[data-postid] > article");
   if (!post) throw "no post";
 
-  // remove the actions menu: we delete the path from inside the button svg so as to retain the
-  // header height
-  const actionsMenu = post.locator("header > button path");
-  actionsMenu.evaluate((el) => el.remove());
-  // remove the log in button
-  const logInButton = post.locator("footer .justify-end");
-  logInButton.evaluate((el) => el.remove());
+  logger.debug(`${logPrefix} preparing page`);
+  await preparePage(page, post);
 
-  // extract basic post info
+  logger.debug(`${logPrefix} extracting metadata`);
   const themeColor =
     (await page.getAttribute('meta[name="theme-color"]', "content")) || "";
   const siteName =
@@ -48,11 +38,14 @@ async function retrievePost(
   const title =
     (await page.getAttribute('meta[property="og:title"]', "content")) || "";
 
-  // get screenshot of post
-  const screenshot = await post.screenshot({ type: "png" });
+  logger.debug(`${logPrefix} generating screenshot`);
+  const rawScreenshot = await post.screenshot({ type: "png" });
 
-  // finish up
+  logger.debug(`${logPrefix} closing page`);
   await page.close();
+
+  logger.debug(`${logPrefix} processing screenshot`);
+  const screenshot = await processScreenshot(rawScreenshot);
 
   return {
     themeColor,
@@ -66,6 +59,44 @@ async function retrievePost(
   };
 }
 
+async function preparePage(page: Page, post: Locator) {
+  // useful post components
+  const [header, footer] = [post.locator("header"), post.locator("footer")];
+
+  // ensure header bar doesn't overlap with tall posts
+  await page.addStyleTag({
+    content: "html { scroll-padding-top: 4rem; }",
+  });
+
+  // remove rounded corners from post: the page background shines through otherwise
+  await post.evaluate((el) => (el.style.borderRadius = "0"));
+  await header.evaluate((el) => (el.style.borderRadius = "0"));
+  await footer.evaluate((el) => (el.style.borderRadius = "0"));
+
+  // remove the actions menu: we delete the path from inside the button svg so as to retain the
+  // header height
+  await header.locator("> button path").evaluate((el) => el.remove());
+
+  // remove the log in button
+  await footer.locator(".justify-end").evaluate((el) => el.remove());
+}
+
+async function processScreenshot(buffer: Buffer): Promise<Buffer> {
+  const { width, height } = await sharp(buffer).metadata();
+  if (!width || !height) throw "no width and/or height";
+
+  // limit aspect ratio
+  const aspectRatio = { width: 16, height: 9 * 2 };
+  const newHeight = Math.min(
+    height,
+    Math.trunc((width * aspectRatio.height) / aspectRatio.width)
+  );
+
+  return sharp(buffer)
+    .extract({ left: 0, top: 0, width, height: newHeight })
+    .toBuffer();
+}
+
 async function main() {
   logger.info("worker started :o");
   const browser = await chromium.launchPersistentContext(
@@ -75,9 +106,14 @@ async function main() {
   const worker = getPostWorker(async (projectHandle, slug) => {
     const logPrefix = `[@${projectHandle}, ${slug}]`;
     logger.info(`${logPrefix} claimed >:3`);
-    const post = await retrievePost(browser, projectHandle, slug);
-    logger.info(`${logPrefix} complete :3`);
-    return post;
+    try {
+      const post = await retrievePost(browser, projectHandle, slug);
+      logger.info(`${logPrefix} complete :3`);
+      return post;
+    } catch (e) {
+      logger.error(`${logPrefix} failed: ${e}`);
+      return null as unknown as Post; // TODO: not this
+    }
   });
   logger.info("processing jobs ^_^");
   await quit();
