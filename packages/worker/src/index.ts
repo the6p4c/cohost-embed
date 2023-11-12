@@ -15,7 +15,7 @@ async function main() {
     logger.info(`[@${projectHandle}, ${slug}] claimed >:3`);
 
     const embed = await retrievePost(projectHandle, slug);
-    logger.info(`[@${projectHandle}, ${slug}] retrieved :3`);
+    logger.info(`[@${projectHandle}, ${slug}] complete :3`);
 
     return embed;
   });
