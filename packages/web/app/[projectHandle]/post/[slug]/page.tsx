@@ -1,7 +1,6 @@
+import config from "cohost-embed-common/config";
 import { getPost } from "cohost-embed-common/job";
 import { notFound } from "next/navigation";
-
-import DiscordEmbed from "./DiscordEmbed";
 
 import styles from "./page.module.css";
 
@@ -17,51 +16,66 @@ export default async function Post({
   const post = await getPost(projectHandle, slug);
   if (!post) return notFound();
 
-  const metadata = (
-    <>
-      <meta property="og:site_name" content={post.siteName} />
-      <meta property="og:title" content={post.title} />
-      <meta property="og:type" content="article" />
-      <meta property="og:url" content={post.url} />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta property="og:image" content={post.imageUrl} />
-      <meta name="twitter:image" content={post.imageUrl} />
-    </>
-  );
-
-  const debugInfo = (
-    <>
-      <h1>request info</h1>
-      <table className={styles.debugTable}>
-        <tbody>
-          <tr>
-            <th scope="row">projectHandle</th>
-            <td>{projectHandle}</td>
-          </tr>
-          <tr>
-            <th scope="row">slug</th>
-            <td>{slug}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h1>example embeds</h1>
-      <h2>discord</h2>
-      <DiscordEmbed embed={post} />
-    </>
-  );
-
-  const redirect =
-    'window.location = document.querySelector("meta[property=\\"og:url\\"]").getAttribute("content");';
+  const imageUrl = `${config.baseUrl}/${projectHandle}/post/${slug}/image`;
 
   return (
     <html lang="en">
-      <head>{metadata}</head>
+      <head>
+        <meta property="og:site_name" content={post.siteName} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={post.url} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:image" content={imageUrl} />
+        <meta name="twitter:image" content={imageUrl} />
+      </head>
       <body>
-        {isDebug ? (
-          debugInfo
-        ) : (
-          <script dangerouslySetInnerHTML={{ __html: redirect }} />
+        {isDebug && (
+          <>
+            <strong>request</strong>
+            <table className={styles.debugTable}>
+              <tbody>
+                <tr>
+                  <th scope="row">projectHandle</th>
+                  <td>{projectHandle}</td>
+                </tr>
+                <tr>
+                  <th scope="row">slug</th>
+                  <td>{slug}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <strong>post</strong>
+            <table className={styles.debugTable}>
+              <tbody>
+                <tr>
+                  <th scope="row">themeColor</th>
+                  <td>{post.themeColor}</td>
+                </tr>
+                <tr>
+                  <th scope="row">siteName</th>
+                  <td>{post.siteName}</td>
+                </tr>
+                <tr>
+                  <th scope="row">title</th>
+                  <td>{post.title}</td>
+                </tr>
+                <tr>
+                  <th scope="row">url</th>
+                  <td>
+                    <a href={post.url}>{post.url}</a>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">image</th>
+                  <td>
+                    <img src={imageUrl} />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </>
         )}
       </body>
     </html>

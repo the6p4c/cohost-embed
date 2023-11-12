@@ -8,7 +8,6 @@ export async function GET(
   }: { params: { projectHandle: string; slug: string } },
 ) {
   const post = await getPost(projectHandle, slug);
-
   if (!post) {
     return new NextResponse("", {
       status: 404,
