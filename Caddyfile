@@ -1,0 +1,8 @@
+cohost.org.doggirl.gay
+
+encode zstd gzip
+reverse_proxy app:3000
+
+tls {
+  issuer acme
+}

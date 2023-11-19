@@ -1,4 +1,12 @@
 services:
+  caddy:
+    image: caddy
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    restart: always
+    ports: ["80:80"]
+
   app:
     build: .
     depends_on: [redis]
@@ -6,7 +14,8 @@ services:
       BASE_URL: https://cohost.org.doggirl.gay
     working_dir: /home/node/app/
     entrypoint: npm start
-    ports: ["3000:3000"]
+    restart: always
+    expose: ["3000"]
 
   worker:
     build: .
@@ -15,15 +24,18 @@ services:
       - browser-data:/data/userDataDir
     working_dir: /home/node/worker/
     entrypoint: node index.js
+    restart: always
 
   redis:
-    build:
-      dockerfile: Dockerfile.redis
+    image: redis
     volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
       - redis-data:/data
     entrypoint: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
     expose: ["6379"]
 
 volumes:
+  caddy-data:
   browser-data:
   redis-data:
