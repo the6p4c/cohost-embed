@@ -3,6 +3,8 @@ services:
     build:
       target: development
     depends_on: [redis]
+    environment:
+      BASE_URL: http://localhost:3000
     volumes:
       - .:/home/node/dev
     working_dir: /home/node/dev
