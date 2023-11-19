@@ -1,6 +1,6 @@
 import { Queue, QueueEvents, Worker } from "bullmq";
 
-import config from "./config";
+import config from "@/common/config";
 
 export type Post = {
   themeColor: string;

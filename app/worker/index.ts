@@ -3,8 +3,8 @@ import { BrowserContext, Locator, Page, chromium } from "playwright";
 import sharp from "sharp";
 import winston from "winston";
 
-import config from "../common/config";
-import { Post, getPostWorker } from "../common/job";
+import config from "@/common/config";
+import { Post, getPostWorker } from "@/common/job";
 
 const logger = winston.createLogger({
   level: config.logLevel,

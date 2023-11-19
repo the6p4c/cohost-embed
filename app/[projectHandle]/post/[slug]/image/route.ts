@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getPost } from "../../../../common/job";
+import { getPost } from "@/common/job";
 
 export async function GET(
   _request: Request,

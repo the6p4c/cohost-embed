@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
-import config from "../../../common/config";
-import { getPost } from "../../../common/job";
+import config from "@/common/config";
+import { getPost } from "@/common/job";
 
 import styles from "./page.module.css";
 
