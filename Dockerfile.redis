@@ -1,0 +1,11 @@
+###############
+# development #
+###############
+FROM redis AS development
+
+##############
+# production #
+##############
+FROM redis AS production
+
+COPY redis.conf /usr/local/etc/redis/redis.conf

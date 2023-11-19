@@ -1,9 +1,10 @@
-import config from "cohost-embed-common/config";
-import { Post, getPostWorker } from "cohost-embed-common/job";
 import process from "node:process";
 import { BrowserContext, Locator, Page, chromium } from "playwright";
 import sharp from "sharp";
 import winston from "winston";
+
+import config from "../common/config";
+import { Post, getPostWorker } from "../common/job";
 
 const logger = winston.createLogger({
   level: config.logLevel,
@@ -14,7 +15,7 @@ const logger = winston.createLogger({
 async function retrievePost(
   browser: BrowserContext,
   projectHandle: string,
-  slug: string
+  slug: string,
 ): Promise<Post> {
   const logPrefix = `[@${projectHandle}, ${slug}]`;
   const url = `https://cohost.org/${projectHandle}/post/${slug}`;
@@ -89,7 +90,7 @@ async function processScreenshot(buffer: Buffer): Promise<Buffer> {
   const aspectRatio = { width: 16, height: 9 * 2 };
   const newHeight = Math.min(
     height,
-    Math.trunc((width * aspectRatio.height) / aspectRatio.width)
+    Math.trunc((width * aspectRatio.height) / aspectRatio.width),
   );
 
   return sharp(buffer)
@@ -99,9 +100,7 @@ async function processScreenshot(buffer: Buffer): Promise<Buffer> {
 
 async function main() {
   logger.info("worker started :o");
-  const browser = await chromium.launchPersistentContext(
-    "./.cache/userDataDir"
-  );
+  const browser = await chromium.launchPersistentContext("/data/userDataDir");
   logger.info("browser launched :O");
   const worker = getPostWorker(async (projectHandle, slug) => {
     const logPrefix = `[@${projectHandle}, ${slug}]`;

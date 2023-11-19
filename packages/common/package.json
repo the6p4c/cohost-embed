@@ -1,7 +1,0 @@
-{
-  "name": "cohost-embed-common",
-  "private": true,
-  "dependencies": {
-    "bullmq": "^4.13.2"
-  }
-}

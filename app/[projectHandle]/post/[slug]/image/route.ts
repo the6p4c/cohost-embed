@@ -1,5 +1,6 @@
-import { getPost } from "cohost-embed-common/job";
 import { NextResponse } from "next/server";
+
+import { getPost } from "../../../../common/job";
 
 export async function GET(
   _request: Request,

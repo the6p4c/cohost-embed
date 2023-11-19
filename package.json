@@ -1,0 +1,31 @@
+{
+  "name": "cohost-embed",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "app:dev": "next dev",
+    "app:build": "next build",
+    "worker:dev": "tsx watch --clear-screen=false app/worker/index.ts",
+    "worker:build": "ncc build app/worker/index.ts -o dist/worker"
+  },
+  "dependencies": {
+    "@vercel/ncc": "^0.38.1",
+    "bullmq": "^4.14.0",
+    "next": "14.0.2",
+    "playwright": "^1.40.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "sharp": "^0.32.6",
+    "tsx": "^4.1.4",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.9.2",
+    "@types/react": "18.2.37",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.2",
+    "prettier": "^3.0.3",
+    "typescript": "5.2.2"
+  }
+}

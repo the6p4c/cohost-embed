@@ -15,7 +15,7 @@ export type Post = {
 
 export async function getPost(
   projectHandle: string,
-  slug: string
+  slug: string,
 ): Promise<Post | undefined> {
   const connection = { connection: { host: config.redisHost } };
   const queue = new Queue("get-post", connection);
@@ -27,7 +27,7 @@ export async function getPost(
     job
       .waitUntilFinished(queueEvents, config.timeout)
       .then((post) => resolve(post))
-      .catch(() => resolve(undefined))
+      .catch(() => resolve(undefined)),
   );
 
   await queueEvents.close();
@@ -37,7 +37,7 @@ export async function getPost(
 }
 
 export function getPostWorker(
-  processor: (projectHandle: string, slug: string) => Promise<Post>
+  processor: (projectHandle: string, slug: string) => Promise<Post>,
 ): { close: () => Promise<void> } {
   const worker = new Worker(
     "get-post",
@@ -48,7 +48,7 @@ export function getPostWorker(
 
       return processor(projectHandle, slug);
     },
-    { connection: { host: config.redisHost } }
+    { connection: { host: config.redisHost } },
   );
 
   const close = async () => {

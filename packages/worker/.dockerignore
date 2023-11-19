@@ -1,7 +1,0 @@
-Dockerfile
-
-# npm
-node_modules/
-
-# playwright - custom userDataDir for launchPersistentContext
-.cache/userDataDir/

@@ -1,34 +1,34 @@
 services:
-  web:
+  app:
     build:
-      context: ./packages/web
-      target: dev
-    depends_on:
-      - redis
+      target: development
+    depends_on: [redis]
     volumes:
-      - ./packages/web:/home/node/web
-      - ./packages/common:/home/node/common
-    working_dir: /home/node/web
-    entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
-    environment:
-      NODE_ENV: development
-    ports:
-      - "3000:3000"
+      - .:/home/node/dev
+    working_dir: /home/node/dev
+    entrypoint: sh -c "npm install && npm run app:dev"
+    ports: ["3000:3000"]
+
   worker:
-    build: ./packages/worker
-    depends_on:
-      - redis
+    build:
+      target: development
+    depends_on: [redis]
     volumes:
-      - ./packages/worker:/home/node/worker
-      - ./packages/common:/home/node/common
-    working_dir: /home/node/worker
-    entrypoint: sh -c "(cd /home/node/common && npm install) && npm install && npm run dev"
-    environment:
-      NODE_ENV: development
+      - .:/home/node/dev
+      - browser-data:/data/userDataDir
+    working_dir: /home/node/dev
+    entrypoint: sh -c "npm install && npm run worker:dev"
+
   redis:
-    image: redis
+    build:
+      dockerfile: Dockerfile.redis
+      target: development
     volumes:
-      - ./packages/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf
-    expose:
-      - "6379"
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - redis-data:/data
+    entrypoint: redis-server /usr/local/etc/redis/redis.conf
+    expose: ["6379"]
+
+volumes:
+  browser-data:
+  redis-data:

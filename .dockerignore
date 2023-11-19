@@ -1,2 +1,3 @@
-# npm
+.git/
+dist/
 node_modules/

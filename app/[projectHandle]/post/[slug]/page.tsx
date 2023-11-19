@@ -1,6 +1,7 @@
-import config from "cohost-embed-common/config";
-import { getPost } from "cohost-embed-common/job";
 import { notFound } from "next/navigation";
+
+import config from "../../../common/config";
+import { getPost } from "../../../common/job";
 
 import styles from "./page.module.css";
 
