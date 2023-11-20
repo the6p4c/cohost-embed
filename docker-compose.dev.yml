@@ -3,6 +3,7 @@ services:
   # caddy #
   #########
   caddy:
+    entrypoint: caddy run --config /etc/caddy/Caddyfile --watch --adapter caddyfile
     environment:
       - SITE_ADDRESS=localhost:80
 
