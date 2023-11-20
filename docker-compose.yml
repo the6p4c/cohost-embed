@@ -9,8 +9,6 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
-    environment:
-      - SITE_ADDRESS=cohost.org.doggirl.gay
 
     ports: ["80:80", "443:443"]
 
@@ -26,8 +24,6 @@ services:
 
     working_dir: /home/node/app/
     entrypoint: npm start
-    environment:
-      - BASE_URL=https://cohost.org.doggirl.gay
 
     expose: ["3000"]
 

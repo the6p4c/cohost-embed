@@ -1,0 +1,22 @@
+#!/bin/sh
+# spawn ngrok with --host-header=rewrite so that caddy sees localhost and serves up the proper site
+ngrok http 80 --host-header=rewrite >/dev/null &
+NGROK_PID=$!
+trap "kill $NGROK_PID 2>/dev/null" SIGTERM SIGINT
+
+# wait for ngrok to come up
+while ! nc -z localhost 4040; do
+  sleep 0.5
+done
+
+# get the ngrok url, display it, and pass it to the containers
+export BASE_URL=null
+while [ $BASE_URL = "null" ]; do
+  export BASE_URL=`curl http://localhost:4040/api/tunnels 2>/dev/null | jq -r ".tunnels[0].public_url"`
+done
+
+echo "ngrok: $BASE_URL"
+./dev $@
+
+# kill ngrok
+kill $NGROK_PID 2>/dev/null
