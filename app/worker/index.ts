@@ -135,7 +135,7 @@ async function main() {
       logger.info(`${logPrefix} complete :3`);
       return post;
     } catch (e) {
-      logger.error(`${logPrefix} failed: ${e}`);
+      logger.error(`${logPrefix} failed ;_; (${e})`);
       throw e;
     }
   });
