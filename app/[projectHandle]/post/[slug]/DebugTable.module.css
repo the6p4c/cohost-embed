@@ -28,6 +28,20 @@
   max-width: 100%;
 }
 
+.debugTable .tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.debugTable .tag {
+  margin: 0.1rem 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+
+  background: #83254f;
+  color: #ded9d3;
+}
+
 .debugTable code {
   display: block;
   min-height: 10rem;

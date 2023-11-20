@@ -73,11 +73,13 @@ function LinkRow({ name, href }: { name: string; href: string }) {
 function TagsRow({ name, tags }: { name: string; tags: string[] }) {
   return (
     <Row name={name}>
-      {tags.map((tag) => (
-        <span key={tag} className={styles.tag}>
-          {tag}
-        </span>
-      ))}
+      <div className={styles.tags}>
+        {tags.map((tag) => (
+          <span key={tag} className={styles.tag}>
+            {tag}
+          </span>
+        ))}
+      </div>
     </Row>
   );
 }
