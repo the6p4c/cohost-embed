@@ -10,7 +10,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
 
-    ports: ["80:80", "443:443"]
+    ports: ["${PORT_HTTP}:80", "${PORT_HTTPS}:443"]
 
   #######
   # app #
