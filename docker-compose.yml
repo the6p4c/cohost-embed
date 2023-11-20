@@ -45,8 +45,6 @@ services:
       - browser-data:/data/userDataDir
     working_dir: /home/node/worker/
     entrypoint: node index.js
-    environment:
-      - BASE_URL
 
   ##########
   # redis #
