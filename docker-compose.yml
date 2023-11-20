@@ -1,38 +1,65 @@
 services:
+  #########
+  # caddy #
+  #########
   caddy:
     image: caddy
+    restart: always
+
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
-    restart: always
+    environment:
+      - SITE_ADDRESS=cohost.org.doggirl.gay
+
     ports: ["80:80", "443:443"]
 
+  #######
+  # app #
+  #######
   app:
-    build: .
+    build:
+      context: .
+      target: prod-app
     depends_on: [redis]
-    environment:
-      BASE_URL: https://cohost.org.doggirl.gay
+    restart: always
+
     working_dir: /home/node/app/
     entrypoint: npm start
-    restart: always
+    environment:
+      - BASE_URL=https://cohost.org.doggirl.gay
+
     expose: ["3000"]
 
+  ##########
+  # worker #
+  ##########
   worker:
-    build: .
+    build:
+      context: .
+      target: prod-worker
     depends_on: [redis]
+    restart: always
+
     volumes:
       - browser-data:/data/userDataDir
     working_dir: /home/node/worker/
     entrypoint: node index.js
-    restart: always
+    environment:
+      - BASE_URL
 
+  ##########
+  # redis #
+  ##########
   redis:
     image: redis
+    restart: always
+
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
       - redis-data:/data
     entrypoint: redis-server /usr/local/etc/redis/redis.conf
-    restart: always
+
     expose: ["6379"]
 
 volumes:

@@ -6,6 +6,7 @@ node_modules/
 .editorconfig
 .gitignore
 Caddyfile
+dev
 docker-compose.dev.yml
 docker-compose.yml
 Dockerfile

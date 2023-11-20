@@ -1,7 +1,7 @@
-###############
-# development #
-###############
-FROM node:21 as development
+##############
+# playwright #
+##############
+FROM node:21 as playwright
 USER node
 WORKDIR /home/node/
 
@@ -16,10 +16,15 @@ RUN npx playwright install-deps chromium
 USER node
 RUN npx playwright install chromium
 
+#######
+# dev #
+#######
+FROM playwright AS dev
+
 #########
 # build #
 #########
-FROM development as build
+FROM dev as build
 
 COPY --chown=node package.json package-lock.json build/
 RUN cd build/ && npm ci
@@ -28,15 +33,23 @@ COPY --chown=node . build/
 RUN cd build/ && npm run app:build
 RUN cd build/ && npm run worker:build
 
-##############
-# production #
-##############
-FROM development as production
+############
+# prod-app #
+############
+FROM playwright as prod-app
 USER node
 WORKDIR /home/node/
 ENV NODE_ENV production
 
 COPY --from=build --chown=node /home/node/build/.next/standalone/ app/
 COPY --from=build --chown=node /home/node/build/.next/static/ app/.next/static/
+
+###############
+# prod-worker #
+###############
+FROM playwright as prod-worker
+USER node
+WORKDIR /home/node/
+ENV NODE_ENV production
 
 COPY --from=build --chown=node /home/node/build/dist/worker/ worker/

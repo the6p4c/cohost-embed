@@ -1,8 +1,8 @@
-cohost.org.doggirl.gay
+{$SITE_ADDRESS} {
+	encode zstd gzip
+	reverse_proxy app:3000
 
-encode zstd gzip
-reverse_proxy app:3000
-
-tls {
-  issuer acme
+	tls {
+		issuer acme
+	}
 }
