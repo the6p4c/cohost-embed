@@ -15,7 +15,9 @@ export async function GET(
     });
   }
 
-  const response = new NextResponse(Buffer.from(post.image.base64, "base64"));
-  response.headers.set("Content-Type", post.image.mimeType);
+  const response = new NextResponse(
+    Buffer.from(post.screenshot.base64, "base64"),
+  );
+  response.headers.set("Content-Type", post.screenshot.mimeType);
   return response;
 }

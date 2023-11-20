@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 
 import config from "@/common/config";
-import { getPost } from "@/common/job";
-
-import styles from "./page.module.css";
+import { Post, getPost } from "@/common/job";
+import DebugTable from "./DebugTable";
 
 export default async function Post({
   params: { projectHandle, slug },
@@ -22,62 +21,24 @@ export default async function Post({
   return (
     <html lang="en">
       <head>
-        <meta property="og:site_name" content={post.siteName} />
-        <meta property="og:title" content={post.title} />
+        {/* textual metadata: we leave out og:site_name since it's mostly redundant*/}
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={post.url} />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:title" content={post.meta.title} />
+        <meta property="og:url" content={post.meta.url} />
+
+        {/* screenshot */}
         <meta property="og:image" content={imageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={imageUrl} />
       </head>
       <body>
         {isDebug && (
-          <>
-            <strong>request</strong>
-            <table className={styles.debugTable}>
-              <tbody>
-                <tr>
-                  <th scope="row">projectHandle</th>
-                  <td>{projectHandle}</td>
-                </tr>
-                <tr>
-                  <th scope="row">slug</th>
-                  <td>{slug}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <strong>post</strong>
-            <table className={styles.debugTable}>
-              <tbody>
-                <tr>
-                  <th scope="row">themeColor</th>
-                  <td>{post.themeColor}</td>
-                </tr>
-                <tr>
-                  <th scope="row">siteName</th>
-                  <td>{post.siteName}</td>
-                </tr>
-                <tr>
-                  <th scope="row">title</th>
-                  <td>{post.title}</td>
-                </tr>
-                <tr>
-                  <th scope="row">url</th>
-                  <td>
-                    <a href={post.url}>{post.url}</a>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">image</th>
-                  <td>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imageUrl} alt="" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </>
+          <DebugTable
+            projectHandle={projectHandle}
+            slug={slug}
+            post={post}
+            imageUrl={imageUrl}
+          />
         )}
       </body>
     </html>

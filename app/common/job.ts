@@ -3,11 +3,27 @@ import { Queue, QueueEvents, Worker } from "bullmq";
 import config from "@/common/config";
 
 export type Post = {
-  themeColor: string;
-  siteName: string;
-  title: string;
-  url: string;
-  image: {
+  meta: {
+    // <meta name="theme-color" content="...">
+    themeColor: string;
+    // <meta property="og:site_name" content="...">
+    siteName: string;
+    // <meta property="og:title" content="...">
+    title: string;
+    // <meta property="og:description" content="...">
+    description: string;
+    // <meta property="article:published_time" content="...">
+    publishedTime: string;
+    // <meta property="article:author" content="...">
+    authorUrl: string;
+    // <meta property="og:url" content="...">
+    url: string;
+    // <meta property="article:tag" content="...">
+    tags: string[];
+    // <meta property="og:image" content="...">
+    imageUrl: string;
+  };
+  screenshot: {
     mimeType: string;
     base64: string;
   };
