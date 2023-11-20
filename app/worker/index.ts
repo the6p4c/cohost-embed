@@ -136,7 +136,7 @@ async function main() {
       return post;
     } catch (e) {
       logger.error(`${logPrefix} failed: ${e}`);
-      return null as unknown as Post; // TODO: not this
+      throw e;
     }
   });
   logger.info("processing jobs ^_^");
