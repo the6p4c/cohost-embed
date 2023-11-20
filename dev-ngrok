@@ -1,6 +1,6 @@
 #!/bin/sh
 # spawn ngrok with --host-header=rewrite so that caddy sees localhost and serves up the proper site
-ngrok http 80 --host-header=rewrite >/dev/null &
+ngrok http 8080 --host-header=rewrite >/dev/null &
 NGROK_PID=$!
 trap "kill $NGROK_PID 2>/dev/null" SIGTERM SIGINT
 
