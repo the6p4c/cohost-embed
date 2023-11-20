@@ -48,11 +48,7 @@ async function retrievePost(
 
   const getMeta = async (ident: { name: string } | { property: string }) => {
     const metas = await getMetas(ident);
-    if (metas.length == 0) {
-      throw `no matching <meta> elements (ident=${JSON.stringify(ident)})`;
-    }
-
-    return metas[0];
+    return metas[0] || "";
   };
 
   const meta = {
@@ -105,6 +101,21 @@ async function preparePage(page: Page, post: Locator) {
 
   // remove the log in button
   await footer.locator(".justify-end").evaluate((el) => el.remove());
+
+  // expand 18+ content
+  const notBaby = post.locator("button", { hasText: "I am 18+" });
+  if ((await notBaby.count()) == 1) {
+    notBaby.click();
+
+    // hide the "hide post" button and friends
+    await page
+      .locator("button", { hasText: "hide post" })
+      .evaluate((el) => el.parentElement?.parentElement?.remove());
+  }
+
+  // wait until the post is loaded
+  // TODO: does this actually help, or even work at all?
+  await page.waitForLoadState("networkidle");
 }
 
 async function processScreenshot(buffer: Buffer): Promise<Buffer> {
