@@ -28,12 +28,12 @@
   max-width: 100%;
 }
 
-.debugTable .tags {
+.debugTable .list {
   display: flex;
   flex-wrap: wrap;
 }
 
-.debugTable .tag {
+.debugTable .listItem {
   margin: 0.1rem 0.25rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;

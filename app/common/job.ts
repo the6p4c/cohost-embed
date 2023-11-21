@@ -2,6 +2,30 @@ import { Queue, QueueEvents, Worker } from "bullmq";
 
 import config from "@/common/config";
 
+export type PostId = {
+  projectHandle: string;
+  slug: string;
+  flags: Flag[];
+};
+
+export namespace PostId {
+  export function toJobId(id: PostId) {
+    const { projectHandle, slug, flags } = id;
+
+    return `${projectHandle}/${slug}/${flags.join(";")}`;
+  }
+
+  export function fromJobId(id: string) {
+    const [projectHandle, slug, flags] = id.split("/");
+
+    return {
+      projectHandle,
+      slug,
+      flags: flags.length != 0 ? (flags.split(";") as Flag[]) : [],
+    };
+  }
+}
+
 export type Post = {
   meta: {
     // <meta name="theme-color" content="...">
@@ -29,15 +53,18 @@ export type Post = {
   };
 };
 
-export async function getPost(
-  projectHandle: string,
-  slug: string,
-): Promise<Post | undefined> {
+// /!\ big warning: must not contain `;` or `/` as they are used to delimit job ids /!\
+export enum Flag {
+  DarkMode = "DarkMode",
+  Mobile = "Mobile",
+}
+
+export async function getPost(id: PostId): Promise<Post | undefined> {
   const connection = { connection: { host: config.redisHost } };
   const queue = new Queue("get-post", connection);
   const queueEvents = new QueueEvents("get-post", connection);
 
-  const job = await queue.add("", {}, { jobId: `${projectHandle}/${slug}` });
+  const job = await queue.add("", {}, { jobId: PostId.toJobId(id) });
 
   const result = await new Promise<Post | undefined>((resolve) =>
     job
@@ -52,17 +79,14 @@ export async function getPost(
   return result;
 }
 
-export function getPostWorker(
-  processor: (projectHandle: string, slug: string) => Promise<Post>,
-): { close: () => Promise<void> } {
+export function getPostWorker(processor: (id: PostId) => Promise<Post>): {
+  close: () => Promise<void>;
+} {
   const worker = new Worker(
     "get-post",
     async (job) => {
       if (!job.id) throw "no job id";
-
-      const [projectHandle, slug] = job.id.split("/");
-
-      return processor(projectHandle, slug);
+      return processor(PostId.fromJobId(job.id));
     },
     { connection: { host: config.redisHost } },
   );

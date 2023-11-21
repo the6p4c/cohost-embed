@@ -3,21 +3,24 @@ import { notFound } from "next/navigation";
 import config from "@/common/config";
 import { Post, getPost } from "@/common/job";
 import DebugTable from "./DebugTable";
+import getPostId, { Params } from "./params";
 
 export default async function Post({
-  params: { flags, projectHandle, slug },
+  params,
   searchParams: { debug },
 }: {
-  params: { flags: string; projectHandle: string; slug: string };
+  params: Params;
   searchParams: { debug?: string };
 }) {
   const isDebug = debug !== undefined;
 
-  const post = await getPost(projectHandle, slug);
+  const id = getPostId(params);
+  if (!id) return notFound();
+
+  const post = await getPost(id);
   if (!post) return notFound();
 
-  const imageUrl = `${config.baseUrl}/${flags}/${projectHandle}/post/${slug}/image`;
-
+  const imageUrl = `${config.baseUrl}/${id.flagsNormalized}/${id.projectHandle}/post/${id.slug}/image`;
   return (
     <html lang="en">
       <head>
@@ -32,13 +35,7 @@ export default async function Post({
         <meta name="twitter:image" content={imageUrl} />
       </head>
       <body>
-        {isDebug && (
-          <DebugTable
-            request={{ flags, projectHandle, slug }}
-            post={post}
-            imageUrl={imageUrl}
-          />
-        )}
+        {isDebug && <DebugTable id={id} post={post} imageUrl={imageUrl} />}
       </body>
     </html>
   );

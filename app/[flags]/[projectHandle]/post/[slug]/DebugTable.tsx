@@ -1,15 +1,15 @@
 import { ReactNode } from "react";
 
-import { Post } from "@/common/job";
+import { Post, PostId } from "@/common/job";
 
 import styles from "./DebugTable.module.css";
 
 export default function DebugTable({
-  request,
+  id,
   post,
   imageUrl,
 }: {
-  request: { flags: string; projectHandle: string; slug: string };
+  id: PostId;
   post: Post;
   imageUrl: string;
 }) {
@@ -17,9 +17,9 @@ export default function DebugTable({
     <>
       <strong>request</strong>
       <Table>
-        <Row name="flags">{request.flags}</Row>
-        <Row name="projectHandle">{request.projectHandle}</Row>
-        <Row name="slug">{request.slug}</Row>
+        <ListRow name="flags" items={id.flags} />
+        <Row name="projectHandle">{id.projectHandle}</Row>
+        <Row name="slug">{id.slug}</Row>
       </Table>
 
       <strong>post meta</strong>
@@ -30,7 +30,7 @@ export default function DebugTable({
         <Row name="description">{post.meta.description}</Row>
         <LinkRow name="authorUrl" href={post.meta.authorUrl} />
         <LinkRow name="url" href={post.meta.url} />
-        <TagsRow name="tags" tags={post.meta.tags} />
+        <ListRow name="tags" items={post.meta.tags} />
         <ImageRows name="imageUrl" src={post.meta.imageUrl} />
       </Table>
 
@@ -69,13 +69,13 @@ function LinkRow({ name, href }: { name: string; href: string }) {
   );
 }
 
-function TagsRow({ name, tags }: { name: string; tags: string[] }) {
+function ListRow({ name, items }: { name: string; items: string[] }) {
   return (
     <Row name={name}>
-      <div className={styles.tags}>
-        {tags.map((tag) => (
-          <span key={tag} className={styles.tag}>
-            {tag}
+      <div className={styles.list}>
+        {items.map((item) => (
+          <span key={item} className={styles.listItem}>
+            {item}
           </span>
         ))}
       </div>

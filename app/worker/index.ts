@@ -4,34 +4,43 @@ import sharp from "sharp";
 import winston from "winston";
 
 import config from "@/common/config";
-import { Post, getPostWorker } from "@/common/job";
+import { Post, PostId, getPostWorker } from "@/common/job";
 
 const logger = winston.createLogger({
   level: config.logLevel,
-  format: winston.format.cli(),
+  format: winston.format.combine(
+    winston.format.colorize({ level: true }),
+    winston.format.metadata({}),
+    winston.format.printf(({ level, metadata, message }) => {
+      const prefixFromId = (id: PostId) =>
+        id.flags.length === 0
+          ? `[@${id.projectHandle}, ${id.slug}] `
+          : `[@${id.projectHandle}, ${id.slug} {${id.flags.join(" ")}}] `;
+      const prefix = metadata.id ? prefixFromId(metadata.id) : "";
+      return `${level}: ${prefix}${message}`;
+    }),
+  ),
   transports: [new winston.transports.Console()],
 });
 
 async function retrievePost(
   browser: BrowserContext,
-  projectHandle: string,
-  slug: string,
+  id: PostId,
 ): Promise<Post> {
-  const logPrefix = `[@${projectHandle}, ${slug}]`;
-  const url = `https://cohost.org/${projectHandle}/post/${slug}`;
+  const url = `https://cohost.org/${id.projectHandle}/post/${id.slug}`;
 
-  logger.debug(`${logPrefix} navigating to ${url}`);
+  logger.debug(`navigating to ${url}`, { id });
   const page = await browser.newPage();
   await page.goto(url);
 
-  logger.debug(`${logPrefix} looking for post`);
+  logger.debug("looking for post", { id });
   const post = page.locator("[data-postid] > article");
   if (!post) throw "no post";
 
-  logger.debug(`${logPrefix} preparing page`);
+  logger.debug("preparing page", { id });
   await preparePage(page, post);
 
-  logger.debug(`${logPrefix} extracting metadata`);
+  logger.debug("extracting metadata", { id });
   const getMetas = async (ident: { name: string } | { property: string }) => {
     const selector =
       "name" in ident
@@ -63,13 +72,13 @@ async function retrievePost(
     imageUrl: await getMeta({ property: "og:image" }),
   };
 
-  logger.debug(`${logPrefix} generating screenshot`);
+  logger.debug("generating screenshot", { id });
   const rawScreenshot = await post.screenshot({ type: "png" });
 
-  logger.debug(`${logPrefix} closing page`);
+  logger.debug("closing page", { id });
   await page.close();
 
-  logger.debug(`${logPrefix} processing screenshot`);
+  logger.debug("processing screenshot", { id });
   const screenshot = await processScreenshot(rawScreenshot);
 
   return {
@@ -138,15 +147,14 @@ async function main() {
   logger.info("worker started :o");
   const browser = await chromium.launchPersistentContext("/data/userDataDir");
   logger.info("browser launched :O");
-  const worker = getPostWorker(async (projectHandle, slug) => {
-    const logPrefix = `[@${projectHandle}, ${slug}]`;
-    logger.info(`${logPrefix} claimed >:3`);
+  const worker = getPostWorker(async (id) => {
+    logger.info("claimed >:3", { id });
     try {
-      const post = await retrievePost(browser, projectHandle, slug);
-      logger.info(`${logPrefix} complete :3`);
+      const post = await retrievePost(browser, id);
+      logger.info("complete :3", { id });
       return post;
     } catch (e) {
-      logger.error(`${logPrefix} failed ;_; (${e})`);
+      logger.error(`failed ;_; (${e})`, { id });
       throw e;
     }
   });
