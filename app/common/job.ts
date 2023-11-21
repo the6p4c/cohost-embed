@@ -55,8 +55,8 @@ export type Post = {
 
 // /!\ big warning: must not contain `;` or `/` as they are used to delimit job ids /!\
 export enum Flag {
-  DarkMode = "DarkMode",
   Mobile = "Mobile",
+  DarkMode = "DarkMode",
 }
 
 export async function getPost(id: PostId): Promise<Post | undefined> {

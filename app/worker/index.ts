@@ -4,7 +4,7 @@ import sharp from "sharp";
 import winston from "winston";
 
 import config from "@/common/config";
-import { Post, PostId, getPostWorker } from "@/common/job";
+import { Flag, Post, PostId, getPostWorker } from "@/common/job";
 
 const logger = winston.createLogger({
   level: config.logLevel,
@@ -38,7 +38,7 @@ async function retrievePost(
   if (!post) throw "no post";
 
   logger.debug("preparing page", { id });
-  await preparePage(page, post);
+  await preparePage(page, post, id.flags);
 
   logger.debug("extracting metadata", { id });
   const getMetas = async (ident: { name: string } | { property: string }) => {
@@ -90,7 +90,22 @@ async function retrievePost(
   };
 }
 
-async function preparePage(page: Page, post: Locator) {
+async function preparePage(page: Page, post: Locator, flags: Flag[]) {
+  // mobile mode
+  if (flags.includes(Flag.Mobile)) {
+    const height = page.viewportSize()?.height;
+    if (!height) throw "no viewport height";
+
+    // this is what chrome's responsive dev tools uses as the width of an iPhone XR. i feel like
+    // this is a decent middle ground
+    await page.setViewportSize({ width: 414, height });
+  }
+
+  // light mode/dark mode
+  if (flags.includes(Flag.DarkMode)) {
+    await page.emulateMedia({ colorScheme: "dark" });
+  }
+
   // useful post components
   const [header, footer] = [post.locator("header"), post.locator("footer")];
 
