@@ -1,15 +1,7 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "cohost-embed",
-};
+import config from "@/common/config";
 
 export default function Home() {
-  return (
-    <html lang="en">
-      <body>
-        <span>home</span>
-      </body>
-    </html>
-  );
+  return redirect(config.homeRedirect);
 }

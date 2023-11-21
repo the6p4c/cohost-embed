@@ -5,6 +5,7 @@ const config = {
 
   baseUrl: process.env.BASE_URL,
   timeout: 20000,
+  homeRedirect: "https://github.com/the6p4c/cohost-embed#readme",
 
   // based on an iPhone 14 Pro Max
   sizeDefault: {
