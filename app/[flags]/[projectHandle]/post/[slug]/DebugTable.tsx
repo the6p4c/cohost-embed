@@ -5,13 +5,11 @@ import { Post } from "@/common/job";
 import styles from "./DebugTable.module.css";
 
 export default function DebugTable({
-  projectHandle,
-  slug,
+  request,
   post,
   imageUrl,
 }: {
-  projectHandle: string;
-  slug: string;
+  request: { flags: string; projectHandle: string; slug: string };
   post: Post;
   imageUrl: string;
 }) {
@@ -19,8 +17,9 @@ export default function DebugTable({
     <>
       <strong>request</strong>
       <Table>
-        <Row name="projectHandle">{projectHandle}</Row>
-        <Row name="slug">{slug}</Row>
+        <Row name="flags">{request.flags}</Row>
+        <Row name="projectHandle">{request.projectHandle}</Row>
+        <Row name="slug">{request.slug}</Row>
       </Table>
 
       <strong>post meta</strong>

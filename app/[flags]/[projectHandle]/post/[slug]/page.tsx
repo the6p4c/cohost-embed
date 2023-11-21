@@ -5,10 +5,10 @@ import { Post, getPost } from "@/common/job";
 import DebugTable from "./DebugTable";
 
 export default async function Post({
-  params: { projectHandle, slug },
+  params: { flags, projectHandle, slug },
   searchParams: { debug },
 }: {
-  params: { projectHandle: string; slug: string };
+  params: { flags: string; projectHandle: string; slug: string };
   searchParams: { debug?: string };
 }) {
   const isDebug = debug !== undefined;
@@ -16,7 +16,7 @@ export default async function Post({
   const post = await getPost(projectHandle, slug);
   if (!post) return notFound();
 
-  const imageUrl = `${config.baseUrl}/${projectHandle}/post/${slug}/image`;
+  const imageUrl = `${config.baseUrl}/${flags}/${projectHandle}/post/${slug}/image`;
 
   return (
     <html lang="en">
@@ -34,8 +34,7 @@ export default async function Post({
       <body>
         {isDebug && (
           <DebugTable
-            projectHandle={projectHandle}
-            slug={slug}
+            request={{ flags, projectHandle, slug }}
             post={post}
             imageUrl={imageUrl}
           />
