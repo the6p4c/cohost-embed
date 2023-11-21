@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import config from "@/common/config";
 import { Post, getPost } from "@/common/job";
-import DebugTable from "./DebugTable";
+import Debug from "./Debug";
 import getPostId, { Params } from "./params";
 
 export default async function Post({
@@ -35,7 +35,7 @@ export default async function Post({
         <meta name="twitter:image" content={imageUrl} />
       </head>
       <body>
-        {isDebug && <DebugTable id={id} post={post} imageUrl={imageUrl} />}
+        {isDebug && <Debug id={id} post={post} imageUrl={imageUrl} />}
       </body>
     </html>
   );

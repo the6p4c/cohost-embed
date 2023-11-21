@@ -1,39 +1,39 @@
-.debugTable {
+.table {
   margin: 0.25rem 0 1rem 0;
   border-collapse: collapse;
   font-family: monospace;
 }
 
-.debugTable th[scope="row"] {
+.table th[scope="row"] {
   border-right: 1px solid black;
   text-align: right;
   font-weight: normal;
 }
 
-.debugTable th,
-.debugTable td {
+.table th,
+.table td {
   padding: 0.3rem 0.5rem;
   vertical-align: top;
 }
 
-.debugTable th {
+.table th {
   min-width: 7.5rem;
 }
 
-.debugTable td {
+.table td {
   max-width: 30rem;
 }
 
-.debugTable img {
+.table img {
   max-width: 100%;
 }
 
-.debugTable .list {
+.table .list {
   display: flex;
   flex-wrap: wrap;
 }
 
-.debugTable .listItem {
+.table .listItem {
   margin: 0.1rem 0.25rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
@@ -42,7 +42,7 @@
   color: #ded9d3;
 }
 
-.debugTable code {
+.table code {
   display: block;
   min-height: 10rem;
   max-height: 20rem;

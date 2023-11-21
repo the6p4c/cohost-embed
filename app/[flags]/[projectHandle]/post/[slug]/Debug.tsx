@@ -2,9 +2,9 @@ import { ReactNode } from "react";
 
 import { Post, PostId } from "@/common/job";
 
-import styles from "./DebugTable.module.css";
+import styles from "./Debug.module.css";
 
-export default function DebugTable({
+export default function Debug({
   id,
   post,
   imageUrl,
@@ -46,7 +46,7 @@ export default function DebugTable({
 
 function Table({ children }: { children: ReactNode }) {
   return (
-    <table className={styles.debugTable}>
+    <table className={styles.table}>
       <tbody>{children}</tbody>
     </table>
   );
@@ -70,17 +70,17 @@ function LinkRow({ name, href }: { name: string; href: string }) {
 }
 
 function ListRow({ name, items }: { name: string; items: string[] }) {
-  return (
-    <Row name={name}>
-      <div className={styles.list}>
-        {items.map((item) => (
-          <span key={item} className={styles.listItem}>
-            {item}
-          </span>
-        ))}
-      </div>
-    </Row>
+  const list = (
+    <div className={styles.list}>
+      {items.map((item) => (
+        <span key={item} className={styles.listItem}>
+          {item}
+        </span>
+      ))}
+    </div>
   );
+
+  return <Row name={name}>{items.length != 0 ? list : "[empty]"}</Row>;
 }
 
 function ImageRows({ name, src }: { name: string; src: string }) {
