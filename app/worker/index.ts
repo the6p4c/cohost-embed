@@ -41,36 +41,7 @@ async function retrievePost(
   await preparePage(page, post, id.flags);
 
   logger.debug("extracting metadata", { id });
-  const getMetas = async (ident: { name: string } | { property: string }) => {
-    const selector =
-      "name" in ident
-        ? `meta[name="${ident.name}"]`
-        : `meta[property="${ident.property}"]`;
-
-    const metaElements = await page.locator(selector).all();
-    const content = (
-      await Promise.all(metaElements.map((el) => el.getAttribute("content")))
-    ).map((el) => el || "");
-
-    return content;
-  };
-
-  const getMeta = async (ident: { name: string } | { property: string }) => {
-    const metas = await getMetas(ident);
-    return metas[0] || "";
-  };
-
-  const meta = {
-    themeColor: await getMeta({ name: "theme-color" }),
-    siteName: await getMeta({ property: "og:site_name" }),
-    title: await getMeta({ property: "og:title" }),
-    description: await getMeta({ property: "og:description" }),
-    publishedTime: await getMeta({ property: "article:published_time" }),
-    authorUrl: await getMeta({ property: "article:author" }),
-    url: await getMeta({ property: "og:url" }),
-    tags: await getMetas({ property: "article:tag" }),
-    imageUrl: await getMeta({ property: "og:image" }),
-  };
+  const meta = await extractMetadata(page, id.flags);
 
   logger.debug("generating screenshot", { id });
   const rawScreenshot = await post.screenshot({ type: "png" });
@@ -79,7 +50,7 @@ async function retrievePost(
   await page.close();
 
   logger.debug("processing screenshot", { id });
-  const screenshot = await processScreenshot(rawScreenshot);
+  const screenshot = await processScreenshot(rawScreenshot, id.flags);
 
   return {
     meta,
@@ -91,14 +62,10 @@ async function retrievePost(
 }
 
 async function preparePage(page: Page, post: Locator, flags: Flag[]) {
-  // mobile mode
-  if (flags.includes(Flag.Mobile)) {
-    const height = page.viewportSize()?.height;
-    if (!height) throw "no viewport height";
-
-    // this is what chrome's responsive dev tools uses as the width of an iPhone XR. i feel like
-    // this is a decent middle ground
-    await page.setViewportSize({ width: 414, height });
+  // widescreen rendering: we don't need to set the default here as it's already set when the
+  // browser is launched
+  if (flags.includes(Flag.Widescreen)) {
+    await page.setViewportSize(config.sizeWidescreen.viewport);
   }
 
   // light mode/dark mode
@@ -142,12 +109,50 @@ async function preparePage(page: Page, post: Locator, flags: Flag[]) {
   await page.waitForLoadState("networkidle");
 }
 
-async function processScreenshot(buffer: Buffer): Promise<Buffer> {
+async function extractMetadata(page: Page, flags: Flag[]) {
+  const getMetas = async (ident: { name: string } | { property: string }) => {
+    const selector =
+      "name" in ident
+        ? `meta[name="${ident.name}"]`
+        : `meta[property="${ident.property}"]`;
+
+    const metaElements = await page.locator(selector).all();
+    const content = (
+      await Promise.all(metaElements.map((el) => el.getAttribute("content")))
+    ).map((el) => el || "");
+
+    return content;
+  };
+
+  const getMeta = async (ident: { name: string } | { property: string }) => {
+    const metas = await getMetas(ident);
+    return metas[0] || "";
+  };
+
+  return {
+    themeColor: await getMeta({ name: "theme-color" }),
+    siteName: await getMeta({ property: "og:site_name" }),
+    title: await getMeta({ property: "og:title" }),
+    description: await getMeta({ property: "og:description" }),
+    publishedTime: await getMeta({ property: "article:published_time" }),
+    authorUrl: await getMeta({ property: "article:author" }),
+    url: await getMeta({ property: "og:url" }),
+    tags: await getMetas({ property: "article:tag" }),
+    imageUrl: await getMeta({ property: "og:image" }),
+  };
+}
+
+async function processScreenshot(
+  buffer: Buffer,
+  flags: Flag[],
+): Promise<Buffer> {
   const { width, height } = await sharp(buffer).metadata();
   if (!width || !height) throw "no width and/or height";
 
   // limit aspect ratio
-  const aspectRatio = { width: 16, height: 9 * 2 };
+  const aspectRatio = flags.includes(Flag.Widescreen)
+    ? config.sizeWidescreen.aspectRatio
+    : config.sizeDefault.aspectRatio;
   const newHeight = Math.min(
     height,
     Math.trunc((width * aspectRatio.height) / aspectRatio.width),
@@ -160,7 +165,9 @@ async function processScreenshot(buffer: Buffer): Promise<Buffer> {
 
 async function main() {
   logger.info("worker started :o");
-  const browser = await chromium.launchPersistentContext("/data/userDataDir");
+  const browser = await chromium.launchPersistentContext("/data/userDataDir", {
+    viewport: config.sizeDefault.viewport,
+  });
   logger.info("browser launched :O");
   const worker = getPostWorker(async (id) => {
     logger.info("claimed >:3", { id });

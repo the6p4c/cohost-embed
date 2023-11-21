@@ -1,8 +1,8 @@
 import { Flag, PostId } from "@/common/job";
 
 const FLAG_MAP: { [key: string]: Flag | undefined } = {
+  w: Flag.Widescreen,
   d: Flag.DarkMode,
-  m: Flag.Mobile,
 };
 
 export type Params = {

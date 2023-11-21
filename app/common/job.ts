@@ -55,7 +55,7 @@ export type Post = {
 
 // /!\ big warning: must not contain `;` or `/` as they are used to delimit job ids /!\
 export enum Flag {
-  Mobile = "Mobile",
+  Widescreen = "Widescreen",
   DarkMode = "DarkMode",
 }
 
