@@ -11,11 +11,13 @@ export type Params = {
   flags: string;
 };
 
+export type PostIdWithNormalizedFlags = PostId & { flagsNormalized: string };
+
 export default function getPostId({
   projectHandle,
   slug,
   flags,
-}: Params): (PostId & { flagsNormalized: string }) | undefined {
+}: Params): PostIdWithNormalizedFlags | undefined {
   const parsedFlags = parseFlags(flags);
   if (!parsedFlags) return;
 

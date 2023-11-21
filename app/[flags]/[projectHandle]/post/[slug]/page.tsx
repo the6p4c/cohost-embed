@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import config from "@/common/config";
 import { Post, getPost } from "@/common/job";
 import Debug from "./Debug";
-import getPostId, { Params } from "./params";
+import getPostId, { Params, PostIdWithNormalizedFlags } from "./params";
 
 export default async function Post({
   params,
@@ -20,7 +20,7 @@ export default async function Post({
   const post = await getPost(id);
   if (!post) return notFound();
 
-  const imageUrl = `${config.baseUrl}/${id.flagsNormalized}/${id.projectHandle}/post/${id.slug}/image`;
+  const imageUrl = getImageUrl(id);
   return (
     <html lang="en">
       <head>
@@ -39,4 +39,12 @@ export default async function Post({
       </body>
     </html>
   );
+}
+
+function getImageUrl(id: PostIdWithNormalizedFlags): string {
+  const hasFlags = id.flagsNormalized != "";
+
+  return hasFlags
+    ? `${config.baseUrl}/${id.flagsNormalized}/${id.projectHandle}/post/${id.slug}/image`
+    : `${config.baseUrl}/${id.projectHandle}/post/${id.slug}/image`;
 }
