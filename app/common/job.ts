@@ -60,7 +60,7 @@ export enum Flag {
 }
 
 export async function getPost(id: PostId): Promise<Post | undefined> {
-  const connection = { connection: { host: config.redisHost } };
+  const connection = { connection: { host: "redis" } };
   const queue = new Queue("get-post", connection);
   const queueEvents = new QueueEvents("get-post", connection);
 
@@ -88,7 +88,7 @@ export function getPostWorker(processor: (id: PostId) => Promise<Post>): {
       if (!job.id) throw "no job id";
       return processor(PostId.fromJobId(job.id));
     },
-    { connection: { host: config.redisHost } },
+    { connection: { host: "redis" } },
   );
 
   const close = async () => {
