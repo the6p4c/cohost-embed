@@ -34,7 +34,7 @@ async function retrievePost(
   await page.goto(url);
 
   logger.debug("looking for post", { id });
-  const post = page.locator("[data-postid] > article");
+  const post = page.locator(".co-post-box");
   if (!post) throw "no post";
 
   logger.debug("preparing page", { id });
@@ -74,7 +74,10 @@ async function preparePage(page: Page, post: Locator, flags: Flag[]) {
   }
 
   // useful post components
-  const [header, footer] = [post.locator("header"), post.locator("footer")];
+  const [header, footer] = [
+    post.locator(".co-thread-header"),
+    post.locator(".co-thread-footer"),
+  ];
 
   // ensure header bar doesn't overlap with tall posts
   await page.addStyleTag({
@@ -86,21 +89,21 @@ async function preparePage(page: Page, post: Locator, flags: Flag[]) {
   await header.evaluate((el) => (el.style.borderRadius = "0"));
   await footer.evaluate((el) => (el.style.borderRadius = "0"));
 
-  // remove the actions menu: we delete the path from inside the button svg so as to retain the
-  // header height
-  await header.locator("> button path").evaluate((el) => el.remove());
+  // remove the action button: we delete the path from inside the svg so as to retain the header
+  // height
+  await header.locator(".co-action-button path").evaluate((el) => el.remove());
 
   // remove the log in button
-  await footer.locator(".justify-end").evaluate((el) => el.remove());
+  await footer.locator(".co-action-button path").evaluate((el) => el.remove());
 
   // expand 18+ content
-  const notBaby = post.locator("button", { hasText: "I am 18+" });
+  const notBaby = post.locator(".co-filled-button", { hasText: "I am 18+" });
   if ((await notBaby.count()) == 1) {
     notBaby.click();
 
     // hide the "hide post" button and friends
     await page
-      .locator("button", { hasText: "hide post" })
+      .locator(".co-filled-button", { hasText: "hide post" })
       .evaluate((el) => el.parentElement?.parentElement?.remove());
   }
 
