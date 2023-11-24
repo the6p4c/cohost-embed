@@ -4,8 +4,6 @@ services:
   #########
   caddy:
     entrypoint: caddy run --config /etc/caddy/Caddyfile --watch --adapter caddyfile
-    environment:
-      - SITE_ADDRESS=${SITE_ADDRESS}
 
   #######
   # app #
@@ -18,8 +16,6 @@ services:
       - .:/home/node/dev
     working_dir: /home/node/dev
     entrypoint: sh -c "npm install && npm run app:dev"
-    environment:
-      - BASE_URL=${BASE_URL}
 
   ##########
   # worker #

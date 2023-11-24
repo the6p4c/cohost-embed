@@ -9,6 +9,8 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
+    environment:
+      - SITE_ADDRESS=${SITE_ADDRESS}
 
     ports: ["${PORT_HTTP}:80", "${PORT_HTTPS}:443"]
 
@@ -24,6 +26,8 @@ services:
 
     working_dir: /home/node/app/
     entrypoint: npm start
+    environment:
+      - BASE_URL=${BASE_URL}
 
     expose: ["3000"]
 
