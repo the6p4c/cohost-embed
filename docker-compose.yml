@@ -24,7 +24,6 @@ services:
     depends_on: [redis]
     restart: always
 
-    working_dir: /home/node/app/
     entrypoint: npm start
     environment:
       - BASE_URL=${BASE_URL}
@@ -43,7 +42,6 @@ services:
 
     volumes:
       - browser-data:/data/userDataDir
-    working_dir: /home/node/worker/
     entrypoint: node index.js
 
   ##########

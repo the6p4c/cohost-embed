@@ -2,8 +2,6 @@
 # playwright #
 ##############
 FROM node:21 as playwright
-USER node
-WORKDIR /home/node/
 
 # install playwright chromium and its required system dependencies. dependencies are installed first
 # as they're the least likely to change.
@@ -20,36 +18,40 @@ RUN npx playwright install chromium
 # dev #
 #######
 FROM playwright AS dev
+WORKDIR /home/node/dev/
 
 #########
 # build #
 #########
 FROM dev as build
+WORKDIR /home/node/build/
 
-COPY --chown=node package.json package-lock.json build/
-RUN cd build/ && npm ci
-COPY --chown=node . build/
+# copy only the package manifest and lock file, which always change when dependencies change but
+# only occasionally change otherwise. these layers are thus essentially cached based only on the
+# dependency tree.
+COPY --chown=node package.json package-lock.json ./
+RUN npm ci
+# now, copy the full source code
+COPY --chown=node . ./
 
-RUN cd build/ && npm run app:build
-RUN cd build/ && npm run worker:build
+RUN npm run app:build
+RUN npm run worker:build
 
 ############
 # prod-app #
 ############
 FROM playwright as prod-app
-USER node
-WORKDIR /home/node/
 ENV NODE_ENV production
+WORKDIR /home/node/app/
 
-COPY --from=build --chown=node /home/node/build/.next/standalone/ app/
-COPY --from=build --chown=node /home/node/build/.next/static/ app/.next/static/
+COPY --from=build --chown=node /home/node/build/.next/standalone/ ./
+COPY --from=build --chown=node /home/node/build/.next/static/ ./.next/static/
 
 ###############
 # prod-worker #
 ###############
 FROM playwright as prod-worker
-USER node
-WORKDIR /home/node/
 ENV NODE_ENV production
+WORKDIR /home/node/worker/
 
-COPY --from=build --chown=node /home/node/build/dist/worker/ worker/
+COPY --from=build --chown=node /home/node/build/dist/worker/ ./
