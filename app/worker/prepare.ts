@@ -21,10 +21,8 @@ export async function preparePage(page: Page, flags: Flag[]) {
 
 export async function preparePost(post: Locator, flags: Flag[]) {
   // useful post components
-  const [header, footer] = [
-    post.locator(".co-thread-header"),
-    post.locator(".co-thread-footer"),
-  ];
+  const header = post.locator(".co-thread-header");
+  const footer = post.locator(".co-thread-footer");
 
   // remove rounded corners from post: the page background shines through otherwise
   await post.evaluate((el) => (el.style.borderRadius = "0"));
@@ -48,10 +46,14 @@ export async function preparePost(post: Locator, flags: Flag[]) {
   if ((await notBaby.count()) == 1) {
     notBaby.click();
 
-    // hide the "hide post" button and friends
+    // remove the "hide post" button
     await post
       .locator(".co-filled-button", { hasText: "hide post" })
-      .evaluate((el) => el.parentElement?.parentElement?.remove());
+      .evaluate((el) => el.remove());
+    // remove the "18+" badge
+    await post
+      .locator(".co-info-box", { hasText: "18+" })
+      .evaluate((el) => el.remove());
   }
 }
 
