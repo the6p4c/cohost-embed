@@ -22,24 +22,30 @@ export default function Debug({
         <Row name="slug">{id.slug}</Row>
       </Table>
 
-      <strong>post meta</strong>
-      <Table>
-        <Row name="themeColor">{post.meta.themeColor}</Row>
-        <Row name="siteName">{post.meta.siteName}</Row>
-        <Row name="title">{post.meta.title}</Row>
-        <Row name="description">{post.meta.description}</Row>
-        <LinkRow name="authorUrl" href={post.meta.authorUrl} />
-        <LinkRow name="url" href={post.meta.url} />
-        <ListRow name="tags" items={post.meta.tags} />
-        <ImageRows name="imageUrl" src={post.meta.imageUrl} />
-      </Table>
+      <div className={styles.sideBySide}>
+        <div>
+          <strong>post meta</strong>
+          <Table>
+            <Row name="themeColor">{post.meta.themeColor}</Row>
+            <Row name="siteName">{post.meta.siteName}</Row>
+            <Row name="title">{post.meta.title}</Row>
+            <Row name="description">{post.meta.description}</Row>
+            <LinkRow name="authorUrl" href={post.meta.authorUrl} />
+            <LinkRow name="url" href={post.meta.url} />
+            <ListRow name="tags" items={post.meta.tags} />
+            <ImageRows name="imageUrl" src={post.meta.imageUrl} />
+          </Table>
+        </div>
 
-      <strong>post screenshot</strong>
-      <Table>
-        <CodeRow name="base64">{post.screenshot.base64}</CodeRow>
-        <Row name="mimeType">{post.screenshot.mimeType}</Row>
-        <ImageRows name="imageUrl" src={imageUrl} />
-      </Table>
+        <div>
+          <strong>post screenshot</strong>
+          <Table>
+            <ImageRows name="imageUrl" src={imageUrl} />
+            <CodeRow name="base64">{post.screenshot.base64}</CodeRow>
+            <Row name="mimeType">{post.screenshot.mimeType}</Row>
+          </Table>
+        </div>
+      </div>
     </>
   );
 }
