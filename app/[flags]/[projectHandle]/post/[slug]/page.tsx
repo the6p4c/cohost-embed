@@ -33,6 +33,11 @@ export default async function Post({
         <meta property="og:image" content={imageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={imageUrl} />
+
+        {/* redirect to the actual chost; TODO: UA sniffing or something */}
+        {!isDebug && (
+          <meta httpEquiv="refresh" content={`0;url=${post.meta.url}`} />
+        )}
       </head>
       <body>
         {isDebug && <Debug id={id} post={post} imageUrl={imageUrl} />}
