@@ -64,7 +64,9 @@ function Row({ name, children }: { name: string; children: ReactNode }) {
 function LinkRow({ name, href }: { name: string; href: string }) {
   return (
     <Row name={name}>
-      <a href={href}>{href}</a>
+      <a target="_blank" href={href}>
+        {href}
+      </a>
     </Row>
   );
 }
@@ -88,7 +90,7 @@ function ImageRows({ name, src }: { name: string; src: string }) {
     <>
       <LinkRow name={name} href={src} />
       <Row name={`[${name}]`}>
-        <a href={src}>
+        <a target="_blank" href={src}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={src} alt="" />
         </a>
