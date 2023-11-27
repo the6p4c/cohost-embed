@@ -17,6 +17,7 @@ const config = {
     viewport: { width: 1920, height: 1080 },
     aspectRatio: { width: 16, height: 9 * 2 },
   },
+  deviceScaleFactor: 2,
 };
 
 export default config;

@@ -173,6 +173,7 @@ async function main() {
   logger.info("worker started :o");
   const browser = await chromium.launchPersistentContext("/data/userDataDir", {
     viewport: config.sizeDefault.viewport,
+    deviceScaleFactor: config.deviceScaleFactor,
   });
   logger.info("browser launched :O");
   const worker = getPostWorker(async (id) => {
