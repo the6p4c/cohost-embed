@@ -13,7 +13,7 @@ export async function processScreenshot(
   // limit aspect ratio
   const aspectRatio = flags.includes(Flag.Widescreen)
     ? config.screenshot.widescreen.aspectRatio
-    : config.screenshot.widescreen.aspectRatio;
+    : config.screenshot.default.aspectRatio;
   const newHeight = Math.min(
     height,
     Math.trunc((width * aspectRatio.height) / aspectRatio.width),
