@@ -9,7 +9,6 @@ node_modules/
 .env
 .env.dev
 .gitignore
-Caddyfile
 dev
 dev-ngrok
 docker-compose.dev.yml
