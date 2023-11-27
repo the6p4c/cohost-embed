@@ -89,9 +89,14 @@ async function preparePage(page: Page, post: Locator, flags: Flag[]) {
   await header.evaluate((el) => (el.style.borderRadius = "0"));
   await footer.evaluate((el) => (el.style.borderRadius = "0"));
 
-  // remove the action button: we delete the path from inside the svg so as to retain the header
-  // height
-  await header.locator(".co-action-button path").evaluate((el) => el.remove());
+  // remove the meatball menu button
+  // - we delete the path from inside the svg so as to retain the header height
+  // - in a reply to an ask, the ask balloon is also a .co-action-button so we take the last button
+  //   (which hopefully will be the meatball menu)
+  await header
+    .locator(".co-action-button path")
+    .last()
+    .evaluate((el) => el.remove());
 
   // remove the log in button
   await footer.locator(".co-action-button path").evaluate((el) => el.remove());
