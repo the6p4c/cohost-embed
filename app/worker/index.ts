@@ -5,7 +5,7 @@ import config from "@/common/config";
 import { Post, PostId, getPostWorker } from "@/common/job";
 import logger from "./logger";
 import { extractMetadata } from "./metadata";
-import { preparePage } from "./prepare";
+import { preparePage, preparePost, waitUntilReady } from "./prepare";
 import { processScreenshot } from "./screenshot";
 
 async function main() {
@@ -56,11 +56,15 @@ async function retrievePost(
   if (!post) throw "no post";
 
   logger.debug("preparing page", { id });
-  await preparePage(page, post, id.flags);
+  await preparePage(page, id.flags);
+  logger.debug("preparing post", { id });
+  await preparePost(post, id.flags);
 
   logger.debug("extracting metadata", { id });
   const meta = await extractMetadata(page, id.flags);
 
+  logger.debug("waiting for ready state", { id });
+  await waitUntilReady(page);
   logger.debug("generating screenshot", { id });
   const rawScreenshot = await post.screenshot({ type: "png" });
 

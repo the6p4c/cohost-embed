@@ -3,7 +3,7 @@ import { Locator, Page } from "playwright";
 import config from "@/common/config";
 import { Flag } from "@/common/job";
 
-export async function preparePage(page: Page, post: Locator, flags: Flag[]) {
+export async function preparePage(page: Page, flags: Flag[]) {
   // widescreen rendering: we don't need to set the default here as it's already set when the
   // browser is launched
   if (flags.includes(Flag.Widescreen)) {
@@ -15,14 +15,16 @@ export async function preparePage(page: Page, post: Locator, flags: Flag[]) {
     await page.emulateMedia({ colorScheme: "dark" });
   }
 
+  // delete header bar to ensure it doesn't overlap with tall posts
+  await page.locator("header.fixed").evaluate((el) => el.remove());
+}
+
+export async function preparePost(post: Locator, flags: Flag[]) {
   // useful post components
   const [header, footer] = [
     post.locator(".co-thread-header"),
     post.locator(".co-thread-footer"),
   ];
-
-  // delete header bar to ensure it doesn't overlap with tall posts
-  await page.locator("header.fixed").evaluate((el) => el.remove());
 
   // remove rounded corners from post: the page background shines through otherwise
   await post.evaluate((el) => (el.style.borderRadius = "0"));
@@ -47,12 +49,13 @@ export async function preparePage(page: Page, post: Locator, flags: Flag[]) {
     notBaby.click();
 
     // hide the "hide post" button and friends
-    await page
+    await post
       .locator(".co-filled-button", { hasText: "hide post" })
       .evaluate((el) => el.parentElement?.parentElement?.remove());
   }
+}
 
-  // wait until the post is loaded
+export async function waitUntilReady(page: Page) {
   // TODO: does this actually help, or even work at all?
   await page.waitForLoadState("networkidle");
 }
