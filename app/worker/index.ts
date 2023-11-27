@@ -65,7 +65,7 @@ async function preparePage(page: Page, post: Locator, flags: Flag[]) {
   // widescreen rendering: we don't need to set the default here as it's already set when the
   // browser is launched
   if (flags.includes(Flag.Widescreen)) {
-    await page.setViewportSize(config.sizeWidescreen.viewport);
+    await page.setViewportSize(config.screenshot.widescreen.viewport);
   }
 
   // light mode/dark mode
@@ -157,8 +157,8 @@ async function processScreenshot(
 
   // limit aspect ratio
   const aspectRatio = flags.includes(Flag.Widescreen)
-    ? config.sizeWidescreen.aspectRatio
-    : config.sizeDefault.aspectRatio;
+    ? config.screenshot.widescreen.aspectRatio
+    : config.screenshot.widescreen.aspectRatio;
   const newHeight = Math.min(
     height,
     Math.trunc((width * aspectRatio.height) / aspectRatio.width),
@@ -172,8 +172,8 @@ async function processScreenshot(
 async function main() {
   logger.info("worker started :o");
   const browser = await chromium.launchPersistentContext("/data/userDataDir", {
-    viewport: config.sizeDefault.viewport,
-    deviceScaleFactor: config.deviceScaleFactor,
+    viewport: config.screenshot.default.viewport,
+    deviceScaleFactor: config.screenshot.scale,
   });
   logger.info("browser launched :O");
   const worker = getPostWorker(async (id) => {
