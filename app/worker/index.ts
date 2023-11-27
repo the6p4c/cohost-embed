@@ -79,10 +79,8 @@ async function preparePage(page: Page, post: Locator, flags: Flag[]) {
     post.locator(".co-thread-footer"),
   ];
 
-  // ensure header bar doesn't overlap with tall posts
-  await page.addStyleTag({
-    content: "html { scroll-padding-top: 4rem; }",
-  });
+  // delete header bar to ensure it doesn't overlap with tall posts
+  await page.locator("header.fixed").evaluate((el) => el.remove());
 
   // remove rounded corners from post: the page background shines through otherwise
   await post.evaluate((el) => (el.style.borderRadius = "0"));
