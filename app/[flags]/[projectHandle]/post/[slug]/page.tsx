@@ -21,6 +21,9 @@ export default async function Post({
   if (!post) return notFound();
 
   const imageUrl = getImageUrl(id);
+  const redirect = `window.location = decodeURIComponent("${encodeURIComponent(
+    post.meta.url,
+  )}");`;
   return (
     <html lang="en">
       <head>
@@ -33,13 +36,10 @@ export default async function Post({
         <meta property="og:image" content={imageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={imageUrl} />
-
-        {/* redirect to the actual chost; TODO: UA sniffing or something */}
-        {!isDebug && (
-          <meta httpEquiv="refresh" content={`0;url=${post.meta.url}`} />
-        )}
       </head>
       <body>
+        {/* redirect to the actual chost; TODO: UA sniffing or something */}
+        {!isDebug && <script dangerouslySetInnerHTML={{ __html: redirect }} />}
         {isDebug && <Debug id={id} post={post} imageUrl={imageUrl} />}
       </body>
     </html>
