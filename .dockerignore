@@ -14,5 +14,7 @@ dev-ngrok
 docker-compose.dev.yml
 docker-compose.yml
 Dockerfile
+prod
+prod-deploy
 README.md
 redis.conf
