@@ -1,3 +1,14 @@
+# we use a multi-stage image build to allow development, app/worker builds and production deployment
+# to all take place inside docker.
+#
+# ```
+# node:21 -> playwright -> dev -> build
+#    |            |                 | (copy artifacts)
+#    |            |                 v
+#    |            \-------------> prod-worker
+#    \--------------------------> prod-app
+# ```
+
 ##############
 # playwright #
 ##############
@@ -40,7 +51,7 @@ RUN npm run worker:build
 ############
 # prod-app #
 ############
-FROM playwright as prod-app
+FROM node:21 as prod-app
 ENV NODE_ENV production
 WORKDIR /home/node/app/
 
