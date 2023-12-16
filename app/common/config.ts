@@ -3,7 +3,7 @@ const production = process.env.NODE_ENV === "production";
 const config = {
   logLevel: production ? "info" : "debug",
 
-  baseUrl: process.env.BASE_URL,
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   timeout: 20000,
   homeRedirect: "https://github.com/the6p4c/cohost-embed#readme",
 

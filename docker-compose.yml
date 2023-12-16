@@ -11,7 +11,7 @@ services:
 
     entrypoint: npm start
     environment:
-      - BASE_URL=${BASE_URL}
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
 
     ports: ["${PORT_HTTP}:3000"]
 
