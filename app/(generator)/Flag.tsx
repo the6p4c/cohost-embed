@@ -36,9 +36,9 @@ function Option({
 }) {
   return (
     <>
-      <span className={`${styles.char} ${selected ? styles.selected : ""}`}>
+      <strong className={`${styles.char} ${selected ? styles.selected : ""}`}>
         {char}
-      </span>
+      </strong>
       <div
         onClick={onClick}
         title={!selected ? `use ${name}` : `using ${name}`}

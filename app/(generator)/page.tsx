@@ -45,15 +45,11 @@ export default function Home() {
       .sort() // canonicalize like the backend does
       .join("");
 
-    // TODO: flag post URLs with comment hashes as unsupported
-    const baseUrl = new URL(config.baseUrl);
-    postUrl.protocol = baseUrl.protocol;
-    postUrl.host = baseUrl.host; // includes port
-    if (flagsString != "") {
-      postUrl.pathname = `/${flagsString}${postUrl.pathname}`;
-    }
-
-    return postUrl.toString();
+    return {
+      prefix: flagsString != "" ? `${config.baseUrl}/` : config.baseUrl,
+      flags: flagsString,
+      suffix: postUrl.pathname,
+    };
   };
 
   const [flags, setFlags] = useState<{ [id: string]: Flag }>({});

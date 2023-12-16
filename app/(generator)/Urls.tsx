@@ -2,6 +2,12 @@ import { ChangeEvent, useState } from "react";
 
 import styles from "./Urls.module.css";
 
+type EmbedUrl = {
+  prefix: string;
+  flags: string;
+  suffix: string;
+};
+
 export default function Urls({
   post,
   embed,
@@ -10,7 +16,7 @@ export default function Urls({
   onChange,
 }: {
   post: string;
-  embed: string;
+  embed: EmbedUrl;
   error?: string;
   placeholderPost: string;
   onChange?: (post: string) => void;
@@ -18,48 +24,63 @@ export default function Urls({
   const [copyVisible, setCopyVisible] = useState(false);
 
   const copyEmbed = async () => {
-    await navigator.clipboard.writeText(embed);
+    const url = embed.prefix + embed.flags + embed.suffix;
+
+    await navigator.clipboard.writeText(url);
+
     setCopyVisible(true);
     setTimeout(() => setCopyVisible(false), 500);
   };
 
+  const input = (
+    <label>
+      <span className={styles.visuallyHidden}>post url:</span>
+      <input
+        type="text"
+        value={post}
+        placeholder={placeholderPost}
+        required
+        onInput={(e: ChangeEvent<HTMLInputElement>) =>
+          onChange && onChange(e.target.value)
+        }
+        title="enter post url"
+        className={styles.post}
+      />
+    </label>
+  );
+
+  const output = error ? (
+    <div className={styles.error}>
+      <span className={styles.visuallyHidden}>error: </span>
+      {error}
+    </div>
+  ) : (
+    <>
+      <div
+        onClick={copyEmbed}
+        title="click to copy"
+        className={`${styles.embed} ${post ? "" : styles.placeholder}`}
+      >
+        <span className={styles.visuallyHidden}>embed url: </span>
+        {embed.prefix}
+        <strong className={styles.embedFlags}>{embed.flags}</strong>
+        {embed.suffix}
+      </div>
+    </>
+  );
+
+  const copy = (
+    <div className={`${styles.copy} ${copyVisible && styles.visible}`}>
+      <CopyIcon />
+      <span>copied!</span>
+    </div>
+  );
+
   return (
     <div className={styles.urls}>
-      <label>
-        <span className={styles.visuallyHidden}>post url:</span>
-        <input
-          type="text"
-          value={post}
-          placeholder={placeholderPost}
-          required
-          onInput={(e: ChangeEvent<HTMLInputElement>) =>
-            onChange && onChange(e.target.value)
-          }
-          title="enter post url"
-          className={styles.post}
-        />
-      </label>
-      {error ? (
-        <div className={styles.error}>
-          <span className={styles.visuallyHidden}>error: </span>
-          {error}
-        </div>
-      ) : (
-        <>
-          <div
-            onClick={copyEmbed}
-            title="click to copy"
-            className={`${styles.embed} ${post ? "" : styles.placeholder}`}
-          >
-            <span className={styles.visuallyHidden}>embed url: </span>
-            {embed}
-          </div>
-        </>
-      )}
-      <div className={`${styles.copyOverlay} ${copyVisible && styles.visible}`}>
-        <CopyIcon />
-        <span>copied!</span>
-      </div>
+      {input}
+      {output}
+      {copy}
     </div>
   );
 }
