@@ -1,8 +1,11 @@
 import { Flag, PostId } from "@/common/job";
 
-const FLAG_MAP: { [key: string]: Flag | undefined } = {
+const FLAG_MAP: { [key: string]: Flag | "ignore" | undefined } = {
   w: Flag.Widescreen,
-  d: Flag.DarkMode,
+  l: Flag.LightMode,
+  // dark mode was originally a flag, but now is the default. we don't want to break existing URLs,
+  // so we need to ignore the flag
+  d: "ignore",
 };
 
 export type Params = {
@@ -48,8 +51,11 @@ function parseFlags(flagsRaw: string):
 
   // return undefined if any of the flags are unknown to us (allow us to introduce new flags by
   // carving out the space now)
-  const flags = chars.map((c) => FLAG_MAP[c]);
-  if (!allDefined(flags)) return;
+  const allFlags = chars.map((c) => FLAG_MAP[c]);
+  if (!allDefined(allFlags)) return;
+
+  // remove ignored flags
+  const flags = allFlags.filter((flag): flag is Flag => flag != "ignore");
 
   return { flagsNormalized, flags };
 }

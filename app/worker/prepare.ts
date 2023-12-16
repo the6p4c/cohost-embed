@@ -10,10 +10,9 @@ export async function preparePage(page: Page, flags: Flag[]) {
     await page.setViewportSize(config.screenshot.widescreen.viewport);
   }
 
-  // light mode/dark mode
-  if (flags.includes(Flag.DarkMode)) {
-    await page.emulateMedia({ colorScheme: "dark" });
-  }
+  // light mode or dark mode (default)
+  const colorScheme = flags.includes(Flag.LightMode) ? "light" : "dark";
+  await page.emulateMedia({ colorScheme });
 
   // delete header bar to ensure it doesn't overlap with tall posts
   //
