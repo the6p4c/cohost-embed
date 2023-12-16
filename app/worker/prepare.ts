@@ -16,6 +16,8 @@ export async function preparePage(page: Page, flags: Flag[]) {
   }
 
   // delete header bar to ensure it doesn't overlap with tall posts
+  //
+  // demo post: https://cohost.org/bark/post/3038541-disclaimer-i-am
   await page.locator("header.fixed").evaluate((el) => el.remove());
 }
 
@@ -38,10 +40,20 @@ export async function preparePost(post: Locator, flags: Flag[]) {
     .last()
     .evaluate((el) => el.remove());
 
-  // remove the log in button
+  // remove the log in seen when a page has "which posts should be visible to users who are logged
+  // out?" set to "no posts"
+  //
+  // demo post: https://cohost.org/kokoscript/post/3835870-several-people-are-s
   await footer.locator(".co-action-button path").evaluate((el) => el.remove());
 
+  // expand content warnings
+  //
+  // demo post: https://cohost.org/bark-test/post/3771667-cw-post-2
+  // TODO: expand content warnings
+
   // expand 18+ content
+  //
+  // demo post: https://cohost.org/bark-test/post/3771515-18-post-2
   const notBaby = post.locator(".co-filled-button", { hasText: "I am 18+" });
   if ((await notBaby.count()) == 1) {
     notBaby.click();
