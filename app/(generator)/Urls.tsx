@@ -58,6 +58,7 @@ export default function Urls({
       )}
       <div className={`${styles.copyOverlay} ${copyVisible && styles.visible}`}>
         <CopyIcon />
+        <span>copied!</span>
       </div>
     </div>
   );
