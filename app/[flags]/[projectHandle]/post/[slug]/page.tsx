@@ -27,7 +27,7 @@ export default async function Post({
   return (
     <html lang="en">
       <head>
-        {/* textual metadata: we leave out og:site_name since it's mostly redundant*/}
+        {/* textual metadata: we leave out og:site_name since it's mostly redundant */}
         <meta property="og:type" content="article" />
         <meta property="og:title" content={post.meta.title} />
         <meta property="og:url" content={post.meta.url} />

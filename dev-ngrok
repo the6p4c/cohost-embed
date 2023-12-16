@@ -10,13 +10,13 @@ while ! nc -z localhost 4040; do
 done
 
 # get the ngrok url, display it, and pass it to the containers
-export BASE_URL=null
-while [ $BASE_URL = "null" ]; do
-  export BASE_URL=`curl http://localhost:4040/api/tunnels 2>/dev/null | jq -r ".tunnels[0].public_url"`
+export NEXT_PUBLIC_BASE_URL=null
+while [ $NEXT_PUBLIC_BASE_URL = "null" ]; do
+  export NEXT_PUBLIC_BASE_URL=`curl http://localhost:4040/api/tunnels 2>/dev/null | jq -r ".tunnels[0].public_url"`
 done
 
 # spin up the containers
-echo "ngrok: $BASE_URL"
+echo "ngrok: $NEXT_PUBLIC_BASE_URL"
 ./dev $@
 
 # kill ngrok
