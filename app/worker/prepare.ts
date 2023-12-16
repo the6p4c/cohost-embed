@@ -40,11 +40,17 @@ export async function preparePost(post: Locator, flags: Flag[]) {
     .last()
     .evaluate((el) => el.remove());
 
-  // remove the log in seen when a page has "which posts should be visible to users who are logged
-  // out?" set to "no posts"
+  // remove the log in button seen where the like and rebug buttons would usually appear
+  await footer.locator(".co-action-button path").evaluate((el) => el.remove());
+
+  // remove the log in button seen when a page has "which posts should be visible to users who are
+  // logged out?" set to "no posts"
   //
   // demo post: https://cohost.org/kokoscript/post/3835870-several-people-are-s
-  await footer.locator(".co-action-button path").evaluate((el) => el.remove());
+  const logIn = await post
+    .locator(".co-filled-button", { hasText: "log in" })
+    .all();
+  await Promise.all(logIn.map((el) => el.evaluate((el) => el.remove())));
 
   // expand content warnings
   //
