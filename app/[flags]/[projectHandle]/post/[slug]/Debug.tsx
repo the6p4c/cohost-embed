@@ -14,17 +14,19 @@ export default function Debug({
   imageUrl: string;
 }) {
   return (
-    <>
-      <strong>request</strong>
-      <Table>
-        <ListRow name="flags" items={id.flags} />
-        <Row name="projectHandle">{id.projectHandle}</Row>
-        <Row name="slug">{id.slug}</Row>
-      </Table>
+    <main className={styles.main}>
+      <section>
+        <h1>request</h1>
+        <Table>
+          <ListRow name="flags" items={id.flags} />
+          <Row name="projectHandle">{id.projectHandle}</Row>
+          <Row name="slug">{id.slug}</Row>
+        </Table>
+      </section>
 
-      <div className={styles.sideBySide}>
-        <div>
-          <strong>post meta</strong>
+      <section className={styles.sideBySide}>
+        <section>
+          <h1>post meta</h1>
           <Table>
             <Row name="themeColor">{post.meta.themeColor}</Row>
             <Row name="siteName">{post.meta.siteName}</Row>
@@ -35,18 +37,18 @@ export default function Debug({
             <ListRow name="tags" items={post.meta.tags} />
             <ImageRows name="imageUrl" src={post.meta.imageUrl} />
           </Table>
-        </div>
+        </section>
 
-        <div>
-          <strong>post screenshot</strong>
+        <section>
+          <h1>post screenshot</h1>
           <Table>
             <ImageRows name="imageUrl" src={imageUrl} />
             <CodeRow name="base64">{post.screenshot.base64}</CodeRow>
             <Row name="mimeType">{post.screenshot.mimeType}</Row>
           </Table>
-        </div>
-      </div>
-    </>
+        </section>
+      </section>
+    </main>
   );
 }
 
