@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from "react";
 
 import styles from "./Urls.module.css";
 
-type EmbedUrl = {
+type Embed = {
   prefix: string;
   flags: string;
   suffix: string;
@@ -10,30 +10,36 @@ type EmbedUrl = {
 
 export default function Urls({
   post,
-  embed,
-  error,
+  result,
   placeholderPost,
+  closeOnCopy,
   onChange,
 }: {
   post: string;
-  embed: EmbedUrl;
-  error?: string;
+  result: { embed: Embed } | { error: string };
   placeholderPost: string;
+  closeOnCopy?: boolean;
   onChange?: (post: string) => void;
 }) {
   const [copyVisible, setCopyVisible] = useState(false);
 
   const copyEmbed = async () => {
-    const url = embed.prefix + embed.flags + embed.suffix;
+    if ("error" in result) return;
+
+    const { prefix, flags, suffix } = result.embed;
+    const url = prefix + flags + suffix;
 
     await navigator.clipboard.writeText(url);
 
     setCopyVisible(true);
-    setTimeout(() => setCopyVisible(false), 500);
+    setTimeout(() => {
+      setCopyVisible(false);
+      if (closeOnCopy) window.close();
+    }, 500);
   };
 
   const input = (
-    <label>
+    <label className={styles.post}>
       <span className={styles.visuallyHidden}>post url:</span>
       <input
         type="text"
@@ -44,30 +50,28 @@ export default function Urls({
           onChange && onChange(e.target.value)
         }
         title="enter post url"
-        className={styles.post}
       />
     </label>
   );
 
-  const output = error ? (
-    <div className={styles.error}>
-      <span className={styles.visuallyHidden}>error: </span>
-      {error}
-    </div>
-  ) : (
-    <>
+  const output =
+    "embed" in result ? (
       <div
         onClick={copyEmbed}
         title="click to copy"
         className={`${styles.embed} ${post ? "" : styles.placeholder}`}
       >
         <span className={styles.visuallyHidden}>embed url: </span>
-        {embed.prefix}
-        <strong className={styles.embedFlags}>{embed.flags}</strong>
-        {embed.suffix}
+        {result.embed.prefix}
+        <strong className={styles.embedFlags}>{result.embed.flags}</strong>
+        {result.embed.suffix}
       </div>
-    </>
-  );
+    ) : (
+      <div className={styles.error}>
+        <span className={styles.visuallyHidden}>error: </span>
+        {result.error}
+      </div>
+    );
 
   const copy = (
     <div className={`${styles.copy} ${copyVisible && styles.visible}`}>

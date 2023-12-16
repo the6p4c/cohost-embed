@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 
 import config from "@/common/config";
@@ -7,6 +6,7 @@ import Options, { Flag } from "./Flag";
 import Urls from "./Urls";
 
 import styles from "./page.module.css";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 
 const FLAGS = {
   colorScheme: [
@@ -22,61 +22,24 @@ const FLAGS = {
 const DEFAULT_POST = "https://cohost.org/jkap/post/16-i-hit-the-juckport-1";
 
 export default function Home() {
-  const generateEmbed = (post: string, flags: { [id: string]: Flag }) => {
-    if (!config.baseUrl) {
-      throw "no base url (?)";
-    }
-    if (!URL.canParse(post)) {
-      throw "invalid url";
-    }
-
-    const postUrl = new URL(post);
-    if (postUrl.host != "cohost.org") {
-      throw "not cohost";
-    }
-
-    const postUrlComponents = postUrl.pathname.slice(1).split("/");
-    if (postUrlComponents.length != 3 || postUrlComponents[1] != "post") {
-      throw "not a post";
-    }
-
-    const flagsString = Object.values(flags)
-      .map(({ char }) => char)
-      .sort() // canonicalize like the backend does
-      .join("");
-
-    return {
-      prefix: flagsString != "" ? `${config.baseUrl}/` : config.baseUrl,
-      flags: flagsString,
-      suffix: postUrl.pathname,
-    };
-  };
-
   const [flags, setFlags] = useState<{ [id: string]: Flag }>({});
 
-  const [post, setPost] = useState("");
-  const [embed, setEmbed] = useState(generateEmbed(DEFAULT_POST, flags));
-  const [error, setError] = useState<string | undefined>(undefined);
+  const providedPost = parseSearchParams(useSearchParams());
+  const closeOnCopy = !!providedPost;
 
-  const updateEmbed = (post: string, flags: { [id: string]: Flag }) => {
-    try {
-      setEmbed(generateEmbed(post || DEFAULT_POST, flags));
-      setError(undefined);
-    } catch (e: any) {
-      setError(e);
-    }
-  };
+  const [post, setPost] = useState(providedPost || "");
+  const [result, setResult] = useState(generateEmbed(providedPost, flags));
 
   return (
     <div className={styles.container}>
       <Urls
         post={post}
-        embed={embed}
-        error={error}
+        result={result}
         placeholderPost={DEFAULT_POST}
+        closeOnCopy={closeOnCopy}
         onChange={(post) => {
           setPost(post);
-          updateEmbed(post, flags);
+          setResult(generateEmbed(post, flags));
         }}
       />
 
@@ -90,7 +53,7 @@ export default function Home() {
               onChange={(flag) => {
                 const newFlags = { ...flags, [id]: flag };
                 setFlags(newFlags);
-                updateEmbed(post, newFlags);
+                setResult(generateEmbed(post, newFlags));
               }}
             />
           </li>
@@ -98,4 +61,50 @@ export default function Home() {
       </ul>
     </div>
   );
+}
+
+function parseSearchParams(searchParams: ReadonlyURLSearchParams) {
+  const entries = Array.from(searchParams.entries());
+  if (entries.length == 1 && entries[0][1] == "") {
+    return entries[0][0];
+  } else {
+    return undefined;
+  }
+}
+
+function generateEmbed(
+  post: string | undefined,
+  flags: { [id: string]: Flag },
+) {
+  post = post || DEFAULT_POST;
+
+  if (!config.baseUrl) {
+    return { error: "no base url (?)" };
+  }
+  if (!URL.canParse(post)) {
+    return { error: "invalid url" };
+  }
+
+  const postUrl = new URL(post);
+  if (postUrl.host != "cohost.org") {
+    return { error: "not cohost" };
+  }
+
+  const postUrlComponents = postUrl.pathname.slice(1).split("/");
+  if (postUrlComponents.length != 3 || postUrlComponents[1] != "post") {
+    return { error: "not a post" };
+  }
+
+  const flagsString = Object.values(flags)
+    .map(({ char }) => char)
+    .sort() // canonicalize like the backend does
+    .join("");
+
+  return {
+    embed: {
+      prefix: flagsString != "" ? `${config.baseUrl}/` : config.baseUrl,
+      flags: flagsString,
+      suffix: postUrl.pathname,
+    },
+  };
 }
