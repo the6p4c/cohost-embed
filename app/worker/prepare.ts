@@ -51,7 +51,16 @@ export async function preparePost(post: Locator, flags: Flag[]) {
   // expand content warnings
   //
   // demo post: https://cohost.org/bark-test/post/3771667-cw-post-2
-  // TODO: expand content warnings
+  const notScared = post.locator(".co-filled-button", { hasText: "show post" });
+  if ((await notScared.count()) > 0) {
+    // expand all content warnings
+    await notScared.evaluateAll(click);
+
+    // remove the "hide post" button
+    await post
+      .locator(".co-filled-button", { hasText: "hide post" })
+      .evaluateAll(remove);
+  }
 
   // expand 18+ content
   //
@@ -60,7 +69,7 @@ export async function preparePost(post: Locator, flags: Flag[]) {
     hasText: "I am 18+",
   });
   if ((await notBaby.count()) > 0) {
-    // expand all 18+
+    // expand all 18+ content
     await notBaby.evaluateAll(click);
 
     // remove the "hide post" button
