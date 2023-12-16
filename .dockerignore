@@ -6,8 +6,6 @@ dist/
 node_modules/
 .dockerignore
 .editorconfig
-.env
-.env.dev
 .gitignore
 dev
 dev-ngrok
