@@ -1,3 +1,7 @@
+.urls {
+  position: relative;
+}
+
 .post,
 .embed,
 .error {
@@ -32,6 +36,31 @@
 
 .error {
   color: var(--red);
+}
+
+.copyOverlay {
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+
+  position: absolute;
+  inset: 0;
+
+  background: var(--background);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.copyOverlay.visible {
+  pointer-events: unset;
+  opacity: 0.9;
+}
+
+.icon {
+  width: 1.5rem;
+  stroke-width: 1.5;
+  stroke: currentColor;
+  fill: none;
 }
 
 .visuallyHidden {
