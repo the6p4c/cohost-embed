@@ -60,18 +60,33 @@ export async function preparePost(post: Locator, flags: Flag[]) {
   // expand 18+ content
   //
   // demo post: https://cohost.org/bark-test/post/3771515-18-post-2
-  const notBaby = post.locator(".co-filled-button", { hasText: "I am 18+" });
-  if ((await notBaby.count()) == 1) {
-    notBaby.click();
+  const notBaby = await post.locator(".co-filled-button", {
+    hasText: "I am 18+",
+  });
+  if ((await notBaby.count()) > 0) {
+    // expand all 18+
+    await notBaby.evaluateAll((els) =>
+      Promise.all(
+        els.map((el) =>
+          el.dispatchEvent(new Event("click", { bubbles: true })),
+        ),
+      ),
+    );
 
     // remove the "hide post" button
     await post
       .locator(".co-filled-button", { hasText: "hide post" })
-      .evaluate((el) => el.remove());
-    // remove the "18+" badge
-    await post
-      .locator(".co-info-box", { hasText: "18+" })
-      .evaluate((el) => el.remove());
+      .evaluateAll(remove);
+  }
+}
+
+async function remove(
+  el: SVGElement | HTMLElement | (SVGElement | HTMLElement)[],
+) {
+  if (Array.isArray(el)) {
+    await Promise.all(el.map((el) => el.remove()));
+  } else {
+    await el.remove();
   }
 }
 
