@@ -1,0 +1,49 @@
+.post,
+.embed,
+.error {
+  margin: 0.5rem 0;
+
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.post {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  font-family: inherit;
+  color: var(--foreground);
+  border: unset;
+  background: unset;
+}
+
+.post::placeholder {
+  color: var(--dim);
+}
+
+.embed {
+  color: var(--blue);
+}
+
+.embed.placeholder {
+  color: var(--blue-darker);
+}
+
+.error {
+  color: var(--red);
+}
+
+.visuallyHidden {
+  display: block;
+
+  /* from bootstrap */
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

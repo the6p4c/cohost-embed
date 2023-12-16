@@ -1,0 +1,37 @@
+.flag {
+  display: inline-grid;
+  grid-auto-rows: auto;
+  grid-template-columns: max-content max-content;
+  align-items: center;
+  column-gap: 0.5rem;
+
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.flag > .char {
+  margin: 0;
+
+  color: var(--dim);
+  font-family: monospace;
+}
+
+.flag > .toggle {
+  padding: 0.5rem 0.75rem;
+  user-select: none;
+  cursor: pointer;
+
+  color: var(--bright);
+  background: var(--dim);
+}
+
+.flag > .char.selected {
+  color: var(--foreground);
+}
+
+.flag > .toggle.selected {
+  cursor: auto;
+
+  color: var(--foreground);
+  background: var(--blue);
+}

@@ -1,0 +1,25 @@
+.container {
+  max-width: 750px;
+  margin: 1.5rem auto;
+  padding: 1rem 2rem;
+
+  color: var(--foreground);
+  border: 1px dashed var(--dim);
+}
+
+.container h2 {
+  margin: 1rem 0 0.5rem 0;
+
+  color: var(--bright);
+  font-size: 1.25rem;
+}
+
+.flags {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  gap: 1.5rem;
+
+  flex-wrap: wrap;
+  list-style-type: none;
+}

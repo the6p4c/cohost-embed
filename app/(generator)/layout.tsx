@@ -1,7 +1,22 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
+import "./layout.css";
+
+export const metadata: Metadata = {
+  title: "cohost embed generator",
+};
+
+const inter = Inter({ subsets: ["latin"] });
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  );
 }

@@ -1,0 +1,19 @@
+:root {
+  --background: #222;
+  --dim: #555;
+  --bright: #999;
+  --foreground: #fff;
+
+  --blue: #27a4dd;
+  --blue-dark: #2393c6;
+  --blue-darker: #1b729a;
+
+  --red: #f1646c;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+
+  background: var(--background);
+}
