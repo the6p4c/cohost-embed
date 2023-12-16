@@ -10,6 +10,10 @@ const nextConfig = {
       },
     ];
   },
+  env: {
+    // wouldn't usually be exposed to the client since it doesn't start with NEXT_PUBLIC_
+    BASE_URL: process.env.BASE_URL,
+  },
 };
 
 module.exports = nextConfig;

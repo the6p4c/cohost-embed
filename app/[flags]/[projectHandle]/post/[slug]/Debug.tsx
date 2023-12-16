@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 
-import { Post, PostId } from "@/common/job";
+import { Post } from "@/common/job";
+import DebugUrlGenerator from "./DebugUrlGenerator";
+import { PostIdWithNormalizedFlags } from "./params";
 
 import styles from "./Debug.module.css";
 
@@ -9,12 +11,17 @@ export default function Debug({
   post,
   imageUrl,
 }: {
-  id: PostId;
+  id: PostIdWithNormalizedFlags;
   post: Post;
   imageUrl: string;
 }) {
   return (
     <main className={styles.main}>
+      <section>
+        <h1>generate url</h1>
+        <DebugUrlGenerator flags={id.flagsNormalized} />
+      </section>
+
       <section>
         <h1>request</h1>
         <Table>
