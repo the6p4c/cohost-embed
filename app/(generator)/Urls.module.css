@@ -28,6 +28,7 @@
 
 .embed {
   color: var(--blue);
+  word-wrap: break-word;
 }
 
 .embed.placeholder {
