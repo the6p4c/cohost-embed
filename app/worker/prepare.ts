@@ -35,22 +35,18 @@ export async function preparePost(post: Locator, flags: Flag[]) {
   // - we delete the path from inside the svg so as to retain the header height
   // - in a reply to an ask, the ask balloon is also a .co-action-button so we take the last button
   //   (which hopefully will be the meatball menu)
-  await header
-    .locator(".co-action-button path")
-    .last()
-    .evaluate((el) => el.remove());
+  await header.locator(".co-action-button path").last().evaluate(remove);
 
   // remove the log in button seen where the like and rebug buttons would usually appear
-  await footer.locator(".co-action-button path").evaluate((el) => el.remove());
+  await footer.locator(".co-action-button path").evaluate(remove);
 
   // remove the log in button seen when a page has "which posts should be visible to users who are
   // logged out?" set to "no posts"
   //
   // demo post: https://cohost.org/kokoscript/post/3835870-several-people-are-s
-  const logIn = await post
+  await post
     .locator(".co-filled-button", { hasText: "log in" })
-    .all();
-  await Promise.all(logIn.map((el) => el.evaluate((el) => el.remove())));
+    .evaluateAll(remove);
 
   // expand content warnings
   //
@@ -60,18 +56,12 @@ export async function preparePost(post: Locator, flags: Flag[]) {
   // expand 18+ content
   //
   // demo post: https://cohost.org/bark-test/post/3771515-18-post-2
-  const notBaby = await post.locator(".co-filled-button", {
+  const notBaby = post.locator(".co-filled-button", {
     hasText: "I am 18+",
   });
   if ((await notBaby.count()) > 0) {
     // expand all 18+
-    await notBaby.evaluateAll((els) =>
-      Promise.all(
-        els.map((el) =>
-          el.dispatchEvent(new Event("click", { bubbles: true })),
-        ),
-      ),
-    );
+    await notBaby.evaluateAll(click);
 
     // remove the "hide post" button
     await post
@@ -80,17 +70,29 @@ export async function preparePost(post: Locator, flags: Flag[]) {
   }
 }
 
-async function remove(
-  el: SVGElement | HTMLElement | (SVGElement | HTMLElement)[],
-) {
-  if (Array.isArray(el)) {
-    await Promise.all(el.map((el) => el.remove()));
-  } else {
-    await el.remove();
-  }
-}
-
 export async function waitUntilReady(page: Page) {
   // TODO: does this actually help, or even work at all?
   await page.waitForLoadState("networkidle");
+}
+
+type Element = SVGElement | HTMLElement;
+
+function click(el: Element | Element[]) {
+  if (Array.isArray(el)) {
+    // playwright doesn't have a multi-element .click(), and doing a naive .all() and then .click()
+    // on each Locator causes issues if the element is removed from the DOM after being clicked. the
+    // Locators returned from .all() use .first() and .nth(n) to target each element, which break
+    // when the DOM is modified.
+    el.forEach((el) => el.dispatchEvent(new Event("click", { bubbles: true })));
+  } else {
+    click([el]);
+  }
+}
+
+function remove(el: Element | Element[]) {
+  if (Array.isArray(el)) {
+    el.forEach((el) => el.remove());
+  } else {
+    remove([el]);
+  }
 }
